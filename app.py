@@ -6,17 +6,39 @@ import numpy as np
 import pandas as pd
 import joblib
 import json
+import urllib.request
 from pathlib import Path
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import Flask, jsonify, render_template, request, send_from_directory, send_file, abort
 
 from train_real_model import prep
 
+RAW = "data/raw"
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 @app.route("/assets/<path:name>")
 def assets(name):
     return send_from_directory("assets", name)
+
+# ---------------------------------------------------------------- faces
+FACES = Path("data/faces"); FACES.mkdir(exist_ok=True)
+faces_map = pd.read_csv(f"{RAW}/players.csv", usecols=["player_id", "image_url"], dtype={"player_id": "int32"}).dropna()
+faces_map = dict(zip(faces_map["player_id"].astype(int), faces_map["image_url"]))
+
+@app.route("/face/<int:pid>")
+def face(pid):
+    path = FACES / f"{pid}.jpg"
+    if not path.exists():
+        url = faces_map.get(pid)
+        if not url:
+            abort(404)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            data = urllib.request.urlopen(req, timeout=10).read()
+            path.write_bytes(data)
+        except Exception:
+            abort(404)
+    return send_file(path, mimetype="image/jpeg", max_age=86400)
 
 clf_pack = joblib.load("model/real_transfer_classifier.joblib")
 reg_pack = joblib.load("model/real_fee_regressor.joblib")
@@ -58,6 +80,7 @@ def index():
         "name": r["name"], "player_id": int(r["player_id"]), "season": int(r["season"]),
         "position": r["position"], "league": r["league"], "age": float(r["age"]),
         "mv": float(r["market_value_eur"]), "prob": round(r["p"] * 100), "fee": round(r["f"], 1),
+        "pid": int(r["player_id"]),
     } for _, r in risks.nlargest(12, "p").iterrows()]
     return render_template("index.html", metrics=metrics, importance=importance,
                            chart=chart, top_risk=top_risk_rows)
@@ -71,6 +94,7 @@ def search():
     return jsonify([{
         "player_id": int(r["player_id"]), "name": r["name"], "season": int(r["season"]),
         "position": r["position"], "league": r["league"], "mv": float(r["market_value_eur"]),
+        "pid": int(r["player_id"]),
     } for _, r in hits.iterrows()])
 
 @app.route("/api/predict")
@@ -88,7 +112,7 @@ def predict():
     prob, fee = predict_row(r)
     return jsonify({
         "name": r["name"], "season": int(r["season"]), "position": r["position"],
-        "league": r["league"], "age": float(r["age"]),
+        "league": r["league"], "age": float(r["age"]), "face": f"/face/{pid}",
         "apps": int(r["apps"]), "minutes": int(r["minutes"]),
         "goals": int(r["goals"]), "assists": int(r["assists"]),
         "availability": float(r["availability"]), "gap": int(r["longest_gap_days"]),

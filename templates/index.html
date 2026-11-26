@@ -45,6 +45,19 @@ h1{font-size:1.7rem;letter-spacing:-.02em}
 .stat{background:var(--panel2);border-radius:8px;padding:10px 12px}
 .stat .v{font-weight:700}
 .stat .l{font-size:.72rem;color:var(--muted)}
+.ava{position:relative;width:72px;height:72px;border-radius:50%;background:var(--panel2);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid var(--border)}
+.ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.ava b{color:var(--muted);font-size:1.2rem}
+.ava.sm{width:34px;height:34px;border-radius:8px}
+.ava.sm b{font-size:.7rem}
+.pred-title{display:flex;align-items:center;gap:16px}
+.playercell{display:flex;align-items:center;gap:10px}
+.resrow{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.resrow .who{display:flex;align-items:center;gap:10px;min-width:0}
+.resrow .who b{display:block}
+.resrow .who span span{font-size:.8rem;color:var(--muted)}
+.results div{align-items:center}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:30px}
 @media(max-width:760px){.grid2{grid-template-columns:1fr}.gauge{flex-direction:column;align-items:flex-start}}
 h3{font-size:1.05rem;margin-bottom:12px}
@@ -85,9 +98,12 @@ footer{color:var(--muted);font-size:.8rem;margin-top:36px;border-top:1px solid v
 
   <div id="predCard" class="card hidden">
     <div class="pred-head">
-      <div>
-        <h2 id="pName"></h2>
-        <div class="meta" id="pMeta"></div>
+      <div class="pred-title">
+        <span class="ava" id="pAvaWrap"><b id="pInitials"></b><img id="pFace" alt="" onerror="this.style.display='none'"></span>
+        <div>
+          <h2 id="pName"></h2>
+          <div class="meta" id="pMeta"></div>
+        </div>
       </div>
       <div class="gauge">
         <div class="num"><div class="big" id="pProb"></div><div class="lbl">transfer chance</div></div>
@@ -115,7 +131,7 @@ footer{color:var(--muted);font-size:.8rem;margin-top:36px;border-top:1px solid v
       <tbody>
       {% for r in top_risk %}
       <tr>
-        <td><a onclick='loadPlayer({{ r.player_id }}, {{ r.season }})'>{{ r.name }}</a></td>
+        <td><a onclick='loadPlayer({{ r.player_id }}, {{ r.season }})'><span class="playercell"><span class="ava sm"><b>{{ r.name[0] }}</b><img src="/face/{{ r.pid }}" alt="" onerror="this.style.display='none'"></span>{{ r.name }}</span></a></td>
         <td>{{ r.position }}</td><td>{{ r.league }}</td><td>{{ "%.1f"|format(r.age) }}</td>
         <td>EUR {{ "%.1f"|format(r.mv/1000000) }}M</td>
         <td><span class="tag {{ 't-hi' if r.prob>=60 else ('t-md' if r.prob>=30 else 't-lo') }}">{{ r.prob }}%</span></td>
@@ -145,7 +161,9 @@ async function search(q) {
   box.classList.toggle('hidden', list.length === 0);
   list.forEach(p => {
     const d = document.createElement('div');
-    d.innerHTML = `<span class="who"><b>${p.name}</b><span>${p.position} · ${p.league} · season ${p.season}</span></span>
+    d.className = 'resrow';
+    d.innerHTML = `<span class="who"><span class="ava sm"><b>${p.name.trim()[0]}</b><img src="/face/${p.pid}" alt="" onerror="this.style.display='none'"></span>
+                   <span><b>${p.name}</b><span>${p.position} · ${p.league} · season ${p.season}</span></span></span>
                    <span class="mv">${fmtM(p.mv/1e6)}</span>`;
     d.onclick = () => { box.classList.add('hidden'); document.getElementById('q').value = p.name; loadPlayer(p.player_id); };
     box.appendChild(d);
@@ -164,6 +182,10 @@ async function loadPlayer(pid, season) {
   const r = await (await fetch(url)).json();
   if (r.error) return;
   document.getElementById('predCard').classList.remove('hidden');
+  const img = document.getElementById('pFace');
+  img.style.display = ''; img.src = r.face;
+  const parts = r.name.trim().split(/\s+/);
+  document.getElementById('pInitials').textContent = parts[0][0] + (parts.length > 1 ? parts[parts.length-1][0] : '');
   document.getElementById('pName').textContent = r.name;
   document.getElementById('pMeta').textContent =
     `${r.position} · ${r.league} · season ${r.season} · age ${r.age.toFixed(1)}` +
