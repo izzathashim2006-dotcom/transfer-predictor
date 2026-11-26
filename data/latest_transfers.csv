@@ -1,0 +1,61 @@
+player_id,name,date,from_club,to_club,fee_millions,pred_prob,pred_fee
+1193794,Saba Kharebashvili,2026-09-03,Dinamo Tbilisi,Basaksehir,2.5,,
+1500420,Bruninho,2026-08-16,Athletico-PR,Shakhtar D.,11.0,,
+1179146,Dastan Satpaev,2026-08-12,Kairat Almaty,Chelsea,2.4,50.0,8.5
+1275068,Kauã Prates,2026-08-12,Cruzeiro,Dortmund,7.0,,
+989937,Juan Jose Arias,2026-08-01,Atl. Nacional,Salt Lake,1.7,,
+1310998,Mame Alassane Niang,2026-07-14,Lyn,HamKam,0.1,,
+1111663,Kingstone Mutandwa,2026-07-02,SV Ried,Cagliari,1.0,,
+669000,Habib Keïta,2026-07-01,Clermont Foot,Kocaelispor,0.7,33.0,1.2
+915418,Jannik Schuster,2026-07-01,Salzburg,Brentford,18.0,,
+640109,Martín Satriano,2026-07-01,Lyon,Getafe,6.5,54.0,9.9
+646739,Ángel Alarcón,2026-07-01,FC Porto B,Utrecht,2.0,39.0,6.4
+654982,Bilal El Khannouss,2026-07-01,Leicester,Stuttgart,15.0,52.0,28.2
+659813,Piero Hincapié,2026-07-01,Leverkusen,Arsenal,52.0,17.0,53.7
+665618,Satoshi Tanaka,2026-07-01,F. Düsseldorf,FC Schalke 04,1.0,,
+677278,Ibrahim Adel,2026-07-01,Al-Jazira,Nordsjaelland,2.2,,
+671669,Noah Saviolo,2026-07-01,Vit. Guimarães,Trabzonspor,8.5,56.0,11.6
+674054,Leo Walta,2026-07-01,Sirius,Swansea,3.4,,
+697954,Ivan Lepskiy,2026-07-01,Dynamo Moscow,KS Samara,0.3,26.0,0.9
+679597,Casper Terho,2026-07-01,OH Leuven,Sparta R.,0.6,29.0,0.8
+685484,Luka Duric,2026-07-01,Hoffenheim,SC Paderborn,0.2,,
+685657,Silas Andersen,2026-07-01,Häcken,Sporting,7.2,,
+503733,Anthony Gordon,2026-07-01,Newcastle,Barcelona,80.0,30.0,64.6
+1004301,Jérémy Jacquet,2026-07-01,Stade Rennais,Liverpool,63.6,35.0,48.0
+701819,Daniele Ghilardi,2026-07-01,Hellas Verona,Roma,8.0,40.0,11.8
+667251,Hugo Bolin,2026-07-01,Malmö,Mönchengladbach,2.0,40.0,4.2
+705016,Finn van Breemen,2026-07-01,Basel,Famalicão,1.5,,
+742858,Eduardo Anderson,2026-07-01,Alianza FC,Baltika,0.2,,
+895679,Santiago Homenchenko,2026-07-01,Pachuca,Querétaro FC,3.5,,
+765467,Jozhua Vertrouwd,2026-07-01,Castellón,Rayo Vallecano,1.5,20.0,4.7
+718032,Stephane Keller,2026-07-01,AEL Limassol,Al-Ittihad,1.0,,
+724532,Sinclair Armstrong,2026-07-01,Bristol City,Göztepe,1.8,,
+726701,Rodrigo Ribeiro,2026-07-01,Sporting B,Augsburg,5.0,33.0,4.6
+733371,Sota Kawasaki,2026-07-01,Kyoto Sanga,Mainz,1.0,,
+741257,Álex Jiménez,2026-07-01,AC Milan,Bournemouth,18.5,25.0,27.2
+729638,Oleksandr Kemkin,2026-07-01,Karpaty Lviv,Kryvbas,0.2,39.0,1.0
+816135,Pedro Lima,2026-07-01,Avs FS,Sporting,4.0,47.0,3.3
+800948,Jan-Carlo Simić,2026-07-01,RSC Anderlecht,Al-Ittihad,15.0,,
+703772,Milan Smit,2026-07-01,Go Ahead Eagles,Stoke City,5.5,52.0,2.6
+830365,Alisson Santos,2026-07-01,Sporting,Napoli,16.5,52.0,29.9
+839551,Ondrej Kricfalusi,2026-07-01,Banik Ostrava,Union SG,5.0,,
+843286,Felipe Loyola,2026-07-01,Independiente,Pisa,5.5,31.0,4.7
+856068,Jeyland Mitchell,2026-07-01,Feyenoord,Sturm Graz,1.8,,
+583255,Antoine Semenyo,2026-01-09,Bournemouth,Man City,72.0,44.0,65.9
+349066,Alexander Isak,2025-09-01,Newcastle,Liverpool,145.0,43.0,122.5
+388165,Yoane Wissa,2025-09-01,Brentford,Newcastle,57.7,54.0,49.4
+455661,Nick Woltemade,2025-08-30,Stuttgart,Newcastle,75.0,77.0,58.3
+566931,Xavi Simons,2025-08-29,Leipzig,Tottenham,65.0,52.0,70.8
+479999,Eberechi Eze,2025-08-23,Crystal Palace,Arsenal,69.3,39.0,68.7
+659089,Ilya Zabarnyi,2025-08-12,Bournemouth,PSG,63.0,24.0,52.0
+546543,Darwin Núñez,2025-08-09,Liverpool,Al-Hilal,53.0,35.0,55.8
+627442,Benjamin Sesko,2025-08-09,Leipzig,Man Utd,76.5,56.0,81.2
+401923,Victor Osimhen,2025-07-31,Napoli,Galatasaray,75.0,64.0,64.9
+480692,Luis Díaz,2025-07-30,Liverpool,Bayern Munich,70.0,33.0,68.0
+325443,Viktor Gyökeres,2025-07-26,Sporting,Arsenal,66.9,64.0,85.0
+709726,Hugo Ekitiké,2025-07-23,Frankfurt,Liverpool,95.0,56.0,90.2
+413039,Bryan Mbeumo,2025-07-21,Brentford,Man Utd,75.0,50.0,74.8
+554903,Mateo Retegui,2025-07-21,Atalanta,Al-Qadsiah,61.8,31.0,57.0
+503987,Noni Madueke,2025-07-18,Chelsea,Arsenal,56.0,31.0,59.0
+583189,Anthony Elanga,2025-07-11,Nott'm Forest,Newcastle,61.4,33.0,56.9
+543499,Mohammed Kudus,2025-07-10,West Ham,Tottenham,63.8,42.0,56.3

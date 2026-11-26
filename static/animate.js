@@ -48,7 +48,7 @@
   }, { threshold: 0.1 });
 
   function observeAll() {
-    document.querySelectorAll('.card,.metric,.bf-item,.radar-row,.stat,.rbar,.crumbs').forEach(el => {
+    document.querySelectorAll('.card,.metric,.bf-item,.radar-row,.lt-row,.stat,.rbar,.crumbs').forEach(el => {
       if (!el.classList.contains('reveal')) {
         el.classList.add('reveal');
         io.observe(el);
@@ -63,8 +63,8 @@
     muts.forEach(m => {
       [...m.addedNodes].forEach(n => {
         if (n.nodeType !== 1) return;
-        const targets = n.matches('.radar-row,.bf-item,.stat') ? [n]
-          : (n.querySelectorAll ? [...n.querySelectorAll('.radar-row,.bf-item,.stat')] : []);
+        const targets = n.matches('.radar-row,.bf-item,.lt-row,.stat') ? [n]
+          : (n.querySelectorAll ? [...n.querySelectorAll('.radar-row,.bf-item,.lt-row,.stat')] : []);
         targets.forEach(t => {
           if (!t.classList.contains('reveal')) {
             t.classList.add('reveal');

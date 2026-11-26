@@ -25,13 +25,15 @@ FootballTransfers-style UI with:
 | 📊 Prediction card | Transfer probability, expected fee, season stats, availability & injury-gap metrics, market-value trend |
 | 🏟️ Destination clubs | kNN over 1,200+ real past transfers — "most similar historical moves and where they went" |
 | 🔴 Live rumours | Sky Sports Transfer Centre feed, player-matched, each with the model's verdict |
+| 🔄 Latest moves | Real completed transfers from the current window, each with the model's retrospective verdict |
 | 📈 Charts | Transfer rate by age/league, feature importance, fee distribution |
 | ☀️ / 🌙 | Light/dark theme, follows OS preference, persisted |
 
 ## 📁 Project layout
 
 ```
-app.py                   Flask web app (search, predict, rumours, faces)
+app.py                   Flask web app (search, predict, rumours, faces, latest moves)
+build_transfers_feed.py  Builds the latest-completed-transfers feed
 templates/index.html     Single-page UI
 build_real_dataset.py    Builds player-season features from raw Transfermarkt CSVs
 train_real_model.py      Trains classifier + fee regressor, CV metrics

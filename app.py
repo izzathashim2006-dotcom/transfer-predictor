@@ -60,6 +60,23 @@ chart = {
 }
 
 latest = df.sort_values("season").drop_duplicates("player_id", keep="last")
+
+_lt_path = Path("data/latest_transfers.csv")
+latest_transfers = pd.read_csv(_lt_path, dtype={"player_id": "int32"}) if _lt_path.exists() else pd.DataFrame()
+
+@app.route("/api/latest-transfers")
+def api_latest_transfers():
+    n = min(int(request.args.get("n", 12)), 60)
+    if latest_transfers.empty:
+        return jsonify([])
+    rows = latest_transfers.head(n)
+    return jsonify([{
+        "pid": int(r["player_id"]), "name": r["name"], "date": r["date"],
+        "from": r["from_club"], "to": r["to_club"], "fee": float(r["fee_millions"]),
+        "pred_prob": None if pd.isna(r["pred_prob"]) else int(r["pred_prob"]),
+        "pred_fee": None if pd.isna(r["pred_fee"]) else float(r["pred_fee"]),
+        "face": f"/face/{int(r['player_id'])}",
+    } for _, r in rows.iterrows()])
 rumours_mod.NAME_INDEX = rumours_mod._name_index(latest)
 
 # ---- comparable transfers (kNN over real past transfers, precomputed) ----

@@ -300,3 +300,24 @@ footer .fcol a:hover{color:var(--blue)}
 footer .fcol span{display:block;color:var(--muted);font-size:.83rem;padding:3px 0}
 footer code{background:var(--panel2);padding:2px 6px;border-radius:4px;font-size:.78rem}
 @media(max-width:760px){footer{grid-template-columns:1fr;gap:22px}}
+
+/* ---------------- latest completed moves */
+.lt-rows{display:flex;flex-direction:column}
+.lt-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;grid-template-areas:
+  "face main fee verdict" "face main when verdict";column-gap:12px;row-gap:1px;
+  align-items:center;padding:8px 6px;border-bottom:1px solid var(--border);cursor:pointer}
+.lt-row:hover{background:var(--hover)}
+.lt-row .ava{grid-area:face}
+.lt-main{grid-area:main;min-width:0}
+.lt-main b{display:block;font-size:.92rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt-main i{font-style:normal;font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.lt-main em{font-style:normal;color:var(--accent);font-weight:700}
+.lt-fee{grid-area:fee;font-weight:700;font-size:.88rem;text-align:right;font-variant-numeric:tabular-nums}
+.lt-when{grid-area:when;font-size:.72rem;color:var(--muted);text-align:right}
+.ltv{grid-area:verdict;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:14px;justify-self:end;white-space:nowrap}
+.ltv.hi{background:rgba(63,185,80,.14);color:var(--green)}
+.ltv.md{background:rgba(210,153,34,.14);color:var(--amber)}
+.ltv.lo{background:rgba(248,81,73,.12);color:var(--red)}
+.ltv.na{background:var(--panel2);color:var(--muted)}
+@media(max-width:640px){.lt-row{grid-template-columns:34px 1fr auto;grid-template-areas:
+  "face main fee" "face main when" "face verdict verdict"}}

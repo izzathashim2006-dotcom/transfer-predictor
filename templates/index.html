@@ -39,6 +39,7 @@
   <div class="wrap">
     <a href="#predict">Prediction</a>
     <a href="/backtest">Backtest</a>
+    <a href="#moves">Latest Moves</a>
     <a href="/compare">Compare</a>
     <a href="#news">Transfer News</a>
     <a href="#risks">Top Risks</a>
@@ -74,6 +75,11 @@
     <div class="card" id="radar">
     <h3 class="sec">Live transfer radar — top risks right now <span style="font-size:.72rem;color:var(--muted);font-weight:400">(auto-refreshes every 60s)</span></h3>
     <div class="radar-rows" id="radarRows"><div class="rmeta">Scanning {{ metrics.n_rows|default("56,204") }} player-seasons…</div></div>
+  </div>
+
+  <div class="card" id="moves">
+    <h3 class="sec">Latest completed moves — real transfers from the current window</h3>
+    <div class="lt-rows" id="ltRows"><div class="rmeta">Loading…</div></div>
   </div>
 
   <div id="predCard" class="card hidden">
@@ -149,6 +155,7 @@
     <h5>Explore</h5>
     <a href="/">Prediction</a>
     <a href="/backtest">Backtest</a>
+    <a href="#moves">Latest Moves</a>
     <a href="/compare">Compare</a>
     <a href="#news">Transfer news</a>
   </div>
@@ -235,6 +242,29 @@ async function loadPlayer(pid, season) {
   ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
   $('predCard').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
+
+async function loadLatest() {
+  try {
+    const rows = await (await fetch('/api/latest-transfers?n=12')).json();
+    const el = $('ltRows');
+    el.innerHTML = rows.map(r => {
+      const d = new Date(r.date);
+      const when = d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) +
+        (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
+      const verdict = r.pred_prob != null
+        ? `<span class="ltv ${r.pred_prob >= 50 ? 'hi' : r.pred_prob >= 30 ? 'md' : 'lo'}">model: ${r.pred_prob}%${r.pred_fee ? ' · ' + fmtM(r.pred_fee) : ''}</span>`
+        : '<span class="ltv na">not in model</span>';
+      return `<div class="lt-row">
+        <span class="ava sm"><b>${(r.name || '?').trim()[0]}</b><img src="${r.face}" alt="" onerror="this.style.display='none'"></span>
+        <span class="lt-main"><b>${r.name}</b><i>${r.from} <em>➜</em> ${r.to}</i></span>
+        <span class="lt-fee">${r.fee >= 1 ? fmtM(r.fee) : 'EUR ' + r.fee.toFixed(1) + 'M'}</span>
+        <span class="lt-when">${when}</span>
+        ${verdict}
+      </div>`;
+    }).join('');
+  } catch (e) {}
+}
+window.addEventListener('load', loadLatest);
 
 async function loadRadar() {
   try {
