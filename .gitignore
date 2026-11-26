@@ -4,3 +4,4 @@ data/raw/
 data/faces/
 __pycache__/
 *.pyc
+.hf-space-tmp/
