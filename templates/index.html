@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Transfer Predictor — Real Transfermarkt Data</title>
+<meta property="og:title" content="Football Transfer Predictor">
+<meta property="og:description" content="ML transfer odds for 56,204 real player-seasons — probability, expected fee, why, and live rumours.">
+<meta property="og:image" content="https://transfer-predictor-teea.onrender.com/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Football Transfer Predictor">
+<meta name="twitter:description" content="ML transfer odds from real Transfermarkt data — probability, fee, why, and live rumours.">
+<meta name="twitter:image" content="https://transfer-predictor-teea.onrender.com/assets/og.png">
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -14,7 +23,7 @@
 <header class="sitehead">
   <div class="wrap">
     <a class="brand" href="/">
-      <img src="/assets/icon.svg" alt="">
+      <img src="/assets/logo.svg" alt="">
       <div class="brandname">Football<span>Transfer Predictor</span></div>
     </a>
     <div class="headsearch">
@@ -259,7 +268,14 @@ async function loadRumours() {
     $('rumours').innerHTML = '<div class="nbody">Rumours unavailable (network error).</div>';
   }
 }
-window.addEventListener('load', loadRumours);
+window.addEventListener('load', () => {
+  const usp = new URLSearchParams(location.search);
+  const pid = usp.get('p');
+  if (pid) loadPlayer(+pid, usp.get('s') || undefined).then(() => {
+    document.getElementById('predCard').scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
+  loadRumours();
+});
 
 function themeColors() {
   const cs = getComputedStyle(document.documentElement);
