@@ -1,0 +1,13 @@
+# Render Blueprint — deploys the Flask transfer predictor from this repo.
+# Deploy button: https://render.com/deploy?repo=https://github.com/izzathashim2006-dotcom/transfer-predictor
+services:
+  - type: web
+    name: transfer-predictor
+    runtime: python
+    plan: free
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+    healthCheckPath: /
