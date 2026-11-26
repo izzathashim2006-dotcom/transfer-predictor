@@ -25,14 +25,14 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .topbar .wrap{display:flex;justify-content:flex-end;align-items:center;height:100%;gap:10px;
   color:var(--headmuted);font-size:.78rem}
 .sitehead{background:var(--head);border-bottom:1px solid rgba(255,255,255,.06)}
-.sitehead .wrap{display:flex;align-items:center;gap:18px;padding:18px 20px}
+.sitehead .wrap{display:flex;align-items:center;gap:20px;padding:22px 20px}
 .brand{display:flex;align-items:center;gap:14px;text-decoration:none}
-.brand img{width:46px;height:46px}
-.brandname{color:var(--headtext);font-weight:800;font-size:1.45rem;letter-spacing:.02em;line-height:1.05;
+.brand img{width:54px;height:54px}
+.brandname{color:var(--headtext);font-weight:800;font-size:1.7rem;letter-spacing:.02em;line-height:1.05;
   text-transform:uppercase;font-style:italic}
 .brandname span{display:block;font-size:.72rem;font-weight:600;letter-spacing:.28em;color:var(--accent);font-style:normal}
-.headsearch{margin-left:auto;position:relative;width:min(360px,42vw)}
-.headsearch input{width:100%;padding:11px 42px 11px 16px;font-size:.95rem;background:var(--head2);
+.headsearch{margin-left:auto;position:relative;width:min(400px,40vw)}
+.headsearch input{width:100%;padding:13px 44px 13px 16px;font-size:.98rem;border-radius:8px;background:var(--head2);
   border:1px solid rgba(255,255,255,.14);border-radius:6px;color:#fff;outline:none}
 .headsearch input::placeholder{color:var(--headmuted)}
 .headsearch input:focus{border-color:var(--accent)}
@@ -48,12 +48,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .resrow .who span span{font-size:.78rem;color:var(--muted)}
 .resrow .mv{color:var(--green);white-space:nowrap;font-size:.88rem}
 .theme-btn{background:var(--head2);border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:8px;
-  padding:9px 13px;cursor:pointer;font-size:1.05rem;line-height:1}
+  padding:10px 12px;cursor:pointer;line-height:1;display:flex;align-items:center}
+.theme-btn svg{width:18px;height:18px;display:block;stroke:var(--accent)}
 .theme-btn:hover{border-color:var(--accent)}
 
 .mainnav{background:var(--nav)}
 .mainnav .wrap{display:flex;flex-wrap:wrap}
-.mainnav a{color:#dbe7f3;text-decoration:none;font-weight:600;font-size:.9rem;padding:13px 16px;display:block}
+.mainnav a{color:#dbe7f3;text-decoration:none;font-weight:600;font-size:.93rem;padding:15px 18px;display:block}
 .mainnav a:hover{color:#fff;background:rgba(255,255,255,.06)}
 .crumbs{background:var(--head);color:var(--headmuted);font-size:.82rem}
 .crumbs .wrap{padding:9px 20px;display:flex;gap:8px;align-items:center}
@@ -62,22 +63,24 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 /* ---------------- layout: main + sidebar */
 .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:34px;padding-top:34px;margin:0 auto;
-  max-width:1140px;padding-left:20px;padding-right:20px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:44px;padding-top:40px;margin:0 auto;
+  max-width:1200px;padding-left:20px;padding-right:20px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 .colmain{min-width:0}
-.intro h2{color:var(--accent);font-size:1.45rem;margin-bottom:10px}
-.intro .lede{font-style:italic;color:var(--text);margin-bottom:14px}
-.intro p{margin-bottom:12px;font-size:.95rem}
+.intro h2{color:var(--accent);font-size:1.95rem;letter-spacing:-.01em;margin-bottom:14px;line-height:1.2}
+.intro .lede{font-style:italic;color:var(--text);margin-bottom:16px;font-size:1.08rem}
+.intro p{margin-bottom:13px;font-size:.98rem;max-width:64ch}
 
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:20px 0 26px}
-.metric{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-.metric .v{font-size:1.25rem;font-weight:700;color:var(--blue)}
-.metric .l{font-size:.74rem;color:var(--muted)}
-
-.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:24px;
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 30px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
   box-shadow:var(--card-shadow)}
-h3.sec{color:var(--accent);font-size:1.15rem;margin-bottom:14px}
+.metric .v{font-size:1.55rem;font-weight:800;color:var(--blue);letter-spacing:-.01em}
+.metric .l{font-size:.78rem;color:var(--muted);margin-top:2px}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:28px;
+  box-shadow:var(--card-shadow)}
+h3.sec{color:var(--accent);font-size:1.28rem;margin-bottom:18px}
+h3.sec::after{content:'';display:block;width:46px;height:3px;background:var(--accent);border-radius:2px;margin-top:8px}
 
 .ava{position:relative;width:72px;height:72px;border-radius:50%;background:var(--panel2);
   display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid var(--border)}
@@ -91,7 +94,7 @@ h3.sec{color:var(--accent);font-size:1.15rem;margin-bottom:14px}
 .pred-head .meta{color:var(--muted);font-size:.88rem;margin-top:4px}
 .gauge{display:flex;gap:24px}
 .gauge .num{text-align:center}
-.gauge .big{font-size:2.2rem;font-weight:800}
+.gauge .big{font-size:2.7rem;font-weight:800;letter-spacing:-.02em}
 .gauge .lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .bar{height:9px;background:var(--bar-track);border-radius:6px;overflow:hidden;margin:6px 0 18px}
 .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--amber) 55%,var(--red))}
@@ -110,8 +113,8 @@ h3.sec{color:var(--accent);font-size:1.15rem;margin-bottom:14px}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
 @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse;font-size:.9rem}
-th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.93rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
 th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
 td a{color:var(--text);text-decoration:none;cursor:pointer}
 tr:hover td{background:var(--hover)}
@@ -125,7 +128,7 @@ tr:hover td{background:var(--hover)}
 :root[data-theme="dark"] .t-lo{background:rgba(63,185,80,.15)}
 
 /* ---------------- sidebar: news timeline */
-.sidebar h3{color:var(--accent);font-size:1.1rem;margin-bottom:14px}
+.sidebar h3{color:var(--accent);font-size:1.2rem;margin-bottom:16px}
 .timeline{position:relative;padding-left:16px}
 .timeline::before{content:'';position:absolute;left:4px;top:8px;bottom:8px;width:2px;background:var(--border)}
 .nitem{position:relative;padding:0 0 18px 14px}
@@ -133,7 +136,7 @@ tr:hover td{background:var(--hover)}
   background:var(--border)}
 .nitem.live .dot{background:var(--green)}
 .nitem .ntime{font-size:.74rem;color:var(--muted);margin-bottom:2px}
-.nitem .nhead{font-size:.92rem;font-weight:700;cursor:pointer}
+.nitem .nhead{font-size:.95rem;font-weight:700;cursor:pointer;line-height:1.35}
 .nitem .nhead:hover{color:var(--blue)}
 .nitem .nbody{font-size:.84rem;color:var(--muted);margin-top:4px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -225,13 +228,13 @@ footer{color:var(--muted);font-size:.78rem;margin-top:30px;border-top:1px solid 
     </div>
 
     <div class="grid2" id="stats">
-      <div class="card"><h3 class="sec">Transfer rate by age</h3><canvas id="ageChart" height="180"></canvas></div>
-      <div class="card"><h3 class="sec">Transfer rate by league (%)</h3><canvas id="leagueChart" height="180"></canvas></div>
+      <div class="card"><h3 class="sec">Transfer rate by age</h3><canvas id="ageChart" height="210"></canvas></div>
+      <div class="card"><h3 class="sec">Transfer rate by league (%)</h3><canvas id="leagueChart" height="210"></canvas></div>
     </div>
 
     <div class="grid2" id="model">
-      <div class="card"><h3 class="sec">What drives a transfer</h3><canvas id="impChart" height="230"></canvas></div>
-      <div class="card"><h3 class="sec">Transfer fee distribution (EUR M)</h3><canvas id="feeChart" height="230"></canvas></div>
+      <div class="card"><h3 class="sec">What drives a transfer</h3><canvas id="impChart" height="250"></canvas></div>
+      <div class="card"><h3 class="sec">Transfer fee distribution (EUR M)</h3><canvas id="feeChart" height="250"></canvas></div>
     </div>
 
     <div class="card" id="risks">
@@ -394,16 +397,20 @@ new Chart($('feeChart'), {type: 'bar', data: {
   datasets: [{label: 'transfers', data: edges.slice(0, 12).map((_, i) => bins[i] || 0), backgroundColor: '#cf222e'}]
 }, options: {plugins: {legend: {display: false}}, scales: {x: {grid}, y: {grid, ticks, beginAtZero: true}}}});
 }
+const ICONS = {
+  sun: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  moon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
 const themeBtn = $('themeBtn');
 const savedTheme = localStorage.getItem('theme');
 const prefersLight = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches;
 document.documentElement.dataset.theme = savedTheme || (prefersLight ? 'light' : 'dark');
-themeBtn.textContent = document.documentElement.dataset.theme === 'light' ? '🌙' : '☀️';
+themeBtn.innerHTML = ICONS[document.documentElement.dataset.theme === 'light' ? 'moon' : 'sun'];
 themeBtn.onclick = () => {
   const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
   document.documentElement.dataset.theme = next;
   localStorage.setItem('theme', next);
-  themeBtn.textContent = next === 'light' ? '🌙' : '☀️';
+  themeBtn.innerHTML = ICONS[next === 'light' ? 'moon' : 'sun'];
   if (typeof Chart !== 'undefined') initCharts();
 };
 </script>
