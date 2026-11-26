@@ -23,7 +23,8 @@ def assets(name):
 
 # ---------------------------------------------------------------- faces
 FACES = Path("data/faces"); FACES.mkdir(exist_ok=True)
-faces_map = pd.read_csv(f"{RAW}/players.csv", usecols=["player_id", "image_url"], dtype={"player_id": "int32"}).dropna()
+_face_src = "data/face_urls.csv" if Path("data/face_urls.csv").exists() else f"{RAW}/players.csv"
+faces_map = pd.read_csv(_face_src, usecols=["player_id", "image_url"], dtype={"player_id": "int32"}).dropna()
 faces_map = dict(zip(faces_map["player_id"].astype(int), faces_map["image_url"]))
 
 @app.route("/face/<int:pid>")
