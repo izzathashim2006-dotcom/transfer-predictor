@@ -130,6 +130,7 @@
   see. News timeline: Sky Sports Transfer Centre. Run locally: <code>python app.py</code>
 </footer>
 
+<script src="/static/animate.js"></script>
 <script>
 const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
 const $ = id => document.getElementById(id);
@@ -162,6 +163,7 @@ async function loadPlayer(pid, season) {
   const r = await (await fetch(url)).json();
   if (r.error) return;
   $('predCard').classList.remove('hidden');
+  $('predCard').classList.remove('pop'); void $('predCard').offsetWidth; $('predCard').classList.add('pop');
   const img = $('pFace');
   img.style.display = ''; img.src = r.face;
   const parts = r.name.trim().split(/\s+/);
@@ -175,6 +177,7 @@ async function loadPlayer(pid, season) {
   el.textContent = pct + '%';
   el.style.color = pct >= 60 ? 'var(--red)' : pct >= 30 ? 'var(--amber)' : 'var(--green)';
   $('pFee').textContent = r.fee >= 0.2 ? fmtM(r.fee) : '—';
+  if (window.__animateCount) { __animateCount(el, 700); __animateCount($('pFee'), 800); }
   $('pBar').style.width = pct + '%';
   document.getElementById('pDest').style.display = (r.destinations && r.destinations.length) ? '' : 'none';
   $('pDestChips').innerHTML = (r.destinations || []).map(d =>
@@ -206,6 +209,7 @@ async function loadRadar() {
   } catch (e) {}
 }
 window.addEventListener('load', loadRadar);
+window.addEventListener('load', () => { if (window.__animateCount) document.querySelectorAll('.metric .v').forEach(v => __animateCount(v, 900)); });
 setInterval(loadRadar, 60000);
 
 async function loadRumours() {

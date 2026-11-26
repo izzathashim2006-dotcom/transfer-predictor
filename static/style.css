@@ -185,3 +185,30 @@ footer{color:var(--muted);font-size:.78rem;margin-top:30px;border-top:1px solid 
 .radar-row .rp{font-weight:800;font-size:.95rem;text-align:right}
 .radar-row .rf{font-size:.78rem;color:var(--muted);text-align:right}
 @media(max-width:640px){.radar-row{grid-template-columns:34px 1fr 60px 44px}.radar-row .rf{display:none}}
+
+/* ---------------- animations (one-shot) */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.965) translateY(10px)}to{opacity:1;transform:none}}
+.sitehead{animation:fadeDown .45s ease both}
+.mainnav{animation:fadeDown .45s .07s ease both}
+.crumbs{animation:fadeDown .45s .14s ease both}
+.pop{animation:popIn .5s cubic-bezier(.2,.8,.2,1) both}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.no-anim .reveal,.no-anim .pop{opacity:1;transform:none;animation:none}
+.no-anim .sitehead,.no-anim .mainnav,.no-anim .crumbs{animation:none}
+.card,.metric{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease}
+.card:hover,.metric:hover{transform:translateY(-4px)}
+.card:hover{box-shadow:0 10px 28px rgba(10,30,50,.16)}
+:root[data-theme="dark"] .card:hover{box-shadow:0 12px 30px rgba(0,0,0,.55)}
+.ava{overflow:hidden}
+.ava img{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.ava:hover img{transform:scale(1.09)}
+.mainnav a{position:relative}
+.mainnav a::after{content:'';position:absolute;left:16px;right:16px;bottom:9px;height:2px;background:var(--accent);
+  border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.mainnav a:hover::after{transform:scaleX(1)}
+.chip,.dchip,.theme-btn,.tag{transition:transform .2s ease,box-shadow .2s ease}
+.chip:hover,.dchip:hover{transform:translateY(-2px)}
+.theme-btn:hover{transform:rotate(12deg)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

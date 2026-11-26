@@ -107,6 +107,7 @@
   Models: HistGradientBoosting, trained on real Transfermarkt player-scores data · Run locally: <code>python app.py</code>
 </footer>
 
+<script src="/static/animate.js"></script>
 <script>
 const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
 const $ = id => document.getElementById(id);
@@ -148,7 +149,10 @@ function drawCal() {
       scales: {x: {grid: {display: false}}, y: {grid: {color: cs.getPropertyValue('--border').trim()}, beginAtZero: true, title: {display: true, text: '% actually transferred'}}}}
   });
 }
-window.addEventListener('load', () => typeof Chart !== 'undefined' && drawCal());
+window.addEventListener('load', () => {
+  if (typeof Chart !== 'undefined') drawCal();
+  if (window.__animateCount) document.querySelectorAll('.metric .v').forEach(v => __animateCount(v, 900));
+});
 </script>
 </body>
 </html>
