@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player comparison | Transfer Predictor</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+.cmp-picks{display:grid;grid-template-columns:1fr 48px 1fr;gap:14px;align-items:center;margin-bottom:22px}
+@media(max-width:640px){.cmp-picks{grid-template-columns:1fr}}
+.cmp-vs{font-weight:800;color:var(--accent);font-size:1.2rem;text-align:center}
+.searchwrap{position:relative}
+.searchwrap input{width:100%;padding:12px 14px;font-size:.98rem;background:var(--panel);
+  border:1px solid var(--border);border-radius:10px;color:var(--text);outline:none}
+.searchwrap input:focus{border-color:var(--blue)}
+.cmp-results{position:absolute;top:100%;left:0;right:0;background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;margin-top:6px;z-index:20;overflow:hidden;box-shadow:var(--card-shadow);max-height:300px;overflow-y:auto}
+.cmp-results div{padding:9px 14px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cmp-results div:hover{background:var(--hover)}
+.cmp-head{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:640px){.cmp-head{grid-template-columns:1fr}}
+.cmp-card{display:flex;gap:14px;align-items:center;background:var(--panel2);border-radius:12px;padding:14px 16px}
+.cmp-card .big-prob{font-size:1.9rem;font-weight:800}
+.cmp-card .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.cmp-card .nm{font-weight:700;font-size:1.05rem}
+.cmp-card .mt{font-size:.78rem;color:var(--muted)}
+.cmp-verdict{background:var(--panel2);border-left:3px solid var(--accent);border-radius:8px;
+  padding:12px 16px;font-size:.95rem;margin-bottom:18px}
+.cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:760px){.cmp-grid{grid-template-columns:1fr}}
+table.cmp-stats{font-size:.88rem}
+table.cmp-stats td:nth-child(1){color:var(--muted)}
+table.cmp-stats td:nth-child(2),table.cmp-stats td:nth-child(3){font-weight:700;text-align:center;width:70px}
+table.cmp-stats td.win{color:var(--accent)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap"><span>Head-to-head: two players, one model — who is more likely to move?</span></div>
+</div>
+
+<header class="sitehead">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img src="/assets/icon.svg" alt="">
+      <div class="brandname">Football<span>Transfer Predictor</span></div>
+    </a>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark mode" style="margin-left:auto"></button>
+  </div>
+</header>
+
+<nav class="mainnav">
+  <div class="wrap">
+    <a href="/">Prediction</a>
+    <a href="/backtest">Backtest</a>
+    <a href="/compare" style="color:#fff;background:rgba(255,255,255,.08)">Compare</a>
+    <a href="/#news">Transfer News</a>
+    <a href="/#risks">Top Risks</a>
+  </div>
+</nav>
+
+<div class="crumbs"><div class="wrap">Home <span class="sep">›</span> <b>Player comparison</b></div></div>
+
+<div class="single">
+  <div class="card">
+    <div class="cmp-picks">
+      <div class="searchwrap">
+        <input id="qA" placeholder="Player A — e.g. Bellingham" autocomplete="off">
+        <div class="cmp-results hidden" id="resA"></div>
+      </div>
+      <div class="cmp-vs">VS</div>
+      <div class="searchwrap">
+        <input id="qB" placeholder="Player B — e.g. Haaland" autocomplete="off">
+        <div class="cmp-results hidden" id="resB"></div>
+      </div>
+    </div>
+
+    <div id="cmpOut" class="hidden">
+      <div class="cmp-head">
+        <div class="cmp-card" id="cardA"></div>
+        <div class="cmp-card" id="cardB"></div>
+      </div>
+      <div class="cmp-verdict" id="verdict"></div>
+      <div class="cmp-grid">
+        <div class="card" style="margin:0"><h3 class="sec">Model profile (percentiles, higher = stronger)</h3>
+          <canvas id="radar" height="260"></canvas></div>
+        <div class="card" style="margin:0"><h3 class="sec">Season stats</h3>
+          <table class="cmp-stats" id="statTable"></table>
+          <p style="font-size:.78rem;color:var(--muted);margin-top:10px">Probabilities &amp; fees use each player's
+          latest season in the dataset. Percentile axes are computed against all 56,204 player-seasons.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/izzathim2006-dotcom/transfer-predictor" style="color:var(--blue)">GitHub repo</a> ·
+  Models trained on real Transfermarkt data · Run locally: <code>python app.py</code>
+</footer>
+
+<script>
+const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
+const $ = id => document.getElementById(id);
+const ICONS = {
+  sun: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  moon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
+const themeBtn = $('themeBtn');
+document.documentElement.dataset.theme = localStorage.getItem('theme') ||
+  (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+themeBtn.innerHTML = ICONS[document.documentElement.dataset.theme === 'light' ? 'moon' : 'sun'];
+themeBtn.onclick = () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  themeBtn.innerHTML = ICONS[next === 'light' ? 'moon' : 'sun'];
+  renderRadar();
+};
+
+const picked = {a: null, b: null};
+function wireSearch(inputId, resId, side) {
+  const input = $(inputId), box = $(resId);
+  let t;
+  input.addEventListener('input', () => {
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      const q = input.value.trim();
+      if (q.length < 2) { box.classList.add('hidden'); return; }
+      const list = await (await fetch('/api/search?q=' + encodeURIComponent(q))).json();
+      box.innerHTML = '';
+      box.classList.toggle('hidden', !list.length);
+      list.forEach(p => {
+        const d = document.createElement('div');
+        d.innerHTML = `<span><b>${p.name}</b> <small style="color:var(--muted)">${p.position} · ${p.league} · ${p.season}</small></span><span style="color:var(--green)">${fmtM(p.mv/1e6)}</span>`;
+        d.onclick = () => {
+          box.classList.add('hidden');
+          input.value = p.name;
+          picked[side] = p;
+          maybeCompare();
+        };
+        box.appendChild(d);
+      });
+    }, 250);
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.searchwrap')) box.classList.add('hidden'); });
+}
+wireSearch('qA', 'resA', 'a');
+wireSearch('qB', 'resB', 'b');
+
+let data = null;
+async function maybeCompare() {
+  if (!(picked.a && picked.b)) return;
+  data = await (await fetch(`/api/compare?a=${picked.a.player_id}&b=${picked.b.player_id}`)).json();
+  if (data.error) return;
+  $('cmpOut').classList.remove('hidden');
+  for (const side of ['a', 'b']) {
+    const r = data[side];
+    $(side === 'a' ? 'cardA' : 'cardB').innerHTML = `
+      <span class="ava"><b>${r.name.trim()[0]}</b><img src="${r.face}" alt="" onerror="this.style.display='none'"></span>
+      <div style="flex:1">
+        <div class="nm">${r.name}</div>
+        <div class="mt">${r.position} · ${r.league} · season ${r.season} · age ${r.age.toFixed(1)} · ${fmtM(r.mv/1e6)}</div>
+        <div><span class="big-prob" style="color:var(--${r.prob >= 50 ? 'green' : r.prob >= 30 ? 'amber' : 'red'})">${r.prob}%</span>
+        <span class="l">transfer chance · ${fmtM(r.fee)} est.</span></div>
+      </div>`;
+  }
+  $('verdict').textContent = data.verdict;
+  const cols = ['a', 'b'];
+  $('statTable').innerHTML = ['Metric', data.a.name, data.b.name].map((h, i) =>
+    i === 0 ? `<tr><th>${h}</th><th>${data.a.name.split(' ').pop()}</th><th>${data.b.name.split(' ').pop()}</th></tr>` : ''
+  ).join('') + data.a.stats.map(([label, va], i) => {
+    const vb = data.b.stats[i][1];
+    const num = v => parseFloat(String(v).replace(/[^0-9.+-]/g, ''));
+    const aWins = parseFloat(num(va)) >= parseFloat(num(vb));
+    return `<tr><td>${label}</td><td class="${aWins ? 'win' : ''}">${va}</td><td class="${aWins ? '' : 'win'}">${vb}</td></tr>`;
+  }).join('');
+  renderRadar();
+  $('cmpOut').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+let chart = null;
+function renderRadar() {
+  if (!data) return;
+  const cs = getComputedStyle(document.documentElement);
+  Chart.defaults.color = cs.getPropertyValue('--muted').trim();
+  if (chart) chart.destroy();
+  chart = new Chart($('radar'), {
+    type: 'radar',
+    data: {
+      labels: data.axes,
+      datasets: [
+        {label: data.a.name, data: data.a.axes, borderColor: '#0e8a72', backgroundColor: 'rgba(14,138,114,.18)'},
+        {label: data.b.name, data: data.b.axes, borderColor: '#4c8dff', backgroundColor: 'rgba(76,141,255,.18)'}
+      ]
+    },
+    options: {scales: {r: {min: 0, max: 100, ticks: {stepSize: 25, backdropColor: 'transparent'},
+      grid: {color: cs.getPropertyValue('--border').trim()},
+      angleLines: {color: cs.getPropertyValue('--border').trim()},
+      pointLabels: {font: {size: 10}}}},
+      plugins: {legend: {labels: {boxWidth: 12}}}}
+  });
+}
+
+window.addEventListener('load', () => {
+  const usp = new URLSearchParams(location.search);
+  const a = usp.get('a'), b = usp.get('b');
+  if (a && b) {
+    fetch('/api/compare?a=' + a + '&b=' + b).then(r => r.json()).then(d => {
+      if (d.error) return;
+      picked.a = {player_id: +a}; picked.b = {player_id: +b};
+      $('qA').value = d.a.name; $('qB').value = d.b.name;
+      data = d; $('cmpOut').classList.remove('hidden');
+      // re-render cards/stats from URL flow
+      for (const side of ['a', 'b']) {
+        const r = data[side];
+        $(side === 'a' ? 'cardA' : 'cardB').innerHTML = `
+          <span class="ava"><b>${r.name.trim()[0]}</b><img src="${r.face}" alt="" onerror="this.style.display='none'"></span>
+          <div style="flex:1">
+            <div class="nm">${r.name}</div>
+            <div class="mt">${r.position} · ${r.league} · season ${r.season} · age ${r.age.toFixed(1)} · ${fmtM(r.mv/1e6)}</div>
+            <div><span class="big-prob" style="color:var(--${r.prob >= 50 ? 'green' : r.prob >= 30 ? 'amber' : 'red'})">${r.prob}%</span>
+            <span class="l">transfer chance · ${fmtM(r.fee)} est.</span></div>
+          </div>`;
+      }
+      $('verdict').textContent = data.verdict;
+      $('statTable').innerHTML = `<tr><th>Metric</th><th>${data.a.name.split(' ').pop()}</th><th>${data.b.name.split(' ').pop()}</th></tr>` +
+        data.a.stats.map(([label, va], i) => {
+          const vb = data.b.stats[i][1];
+          const num = v => parseFloat(String(v).replace(/[^0-9.+-]/g, ''));
+          const aWins = parseFloat(num(va)) >= parseFloat(num(vb));
+          return `<tr><td>${label}</td><td class="${aWins ? 'win' : ''}">${va}</td><td class="${aWins ? '' : 'win'}">${vb}</td></tr>`;
+        }).join('');
+      renderRadar();
+    });
+  }
+});
+</script>
+</body>
+</html>

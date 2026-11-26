@@ -119,6 +119,71 @@ def index():
     return render_template("index.html", metrics=metrics, importance=importance,
                            chart=chart, top_risk=top_risk_rows(12))
 
+# ---- percentile lookups for the comparison radar ----
+AXES = [
+    ("Goal threat", "goals_per90", False),
+    ("Creativity", "assists_per90", False),
+    ("Minutes volume", "minutes", False),
+    ("Availability", "availability", False),
+    ("Fitness", "longest_gap_days", True),
+    ("Market value", "market_value_eur", False),
+    ("Momentum 12m", "mv_trend_12m", False),
+]
+_pct = {col: np.sort(df[col].fillna(df[col].median()).values) for _, col, _ in AXES}
+_pct["__age__"] = np.sort(np.abs(df["age"].values - 24.5))
+
+def axis_scores(r):
+    out = []
+    for _, col, invert in AXES:
+        v = r[col]
+        v = 0.0 if pd.isna(v) else float(v)
+        rank = float(np.searchsorted(_pct[col], v) / len(_pct[col]) * 100)
+        out.append(int(round(100 - rank)) if invert else int(round(rank)))
+    age_rank = float(np.searchsorted(_pct["__age__"], abs(float(r["age"]) - 24.5)) / len(_pct["__age__"]) * 100)
+    out.append(int(round(100 - age_rank)))
+    return out
+
+def _player_payload(r, prob, fee):
+    return {"pid": int(r["player_id"]), "name": r["name"], "season": int(r["season"]),
+            "position": r["position"], "league": r["league"], "age": float(r["age"]),
+            "mv": float(r["market_value_eur"]), "prob": prob, "fee": fee,
+            "face": f"/face/{int(r['player_id'])}",
+            "stats": [["Apps", int(r["apps"])], ["Minutes", int(r["minutes"])],
+                      ["Goals", int(r["goals"])], ["Assists", int(r["assists"])],
+                      ["Goals/90", round(float(r["goals_per90"]), 2)],
+                      ["Assists/90", round(float(r["assists_per90"]), 2)],
+                      ["Availability", str(int(round(float(r["availability"]) * 100))) + "%"],
+                      ["Longest injury gap", str(int(r["longest_gap_days"])) + "d"],
+                      ["Value trend 12m", ("+" if r["mv_trend_12m"] >= 0 else "") + str(int(round(float(r["mv_trend_12m"]) * 100))) + "%"]],
+            "axes": axis_scores(r)}
+
+@app.route("/compare")
+def compare_page():
+    return render_template("compare.html", metrics=metrics)
+
+@app.route("/api/compare")
+def api_compare():
+    try:
+        pid_a, pid_b = int(request.args["a"]), int(request.args["b"])
+    except (KeyError, ValueError):
+        return jsonify({"error": "need ?a=<player_id>&b=<player_id>"}), 400
+    rows = df[df["player_id"].isin([pid_a, pid_b])].sort_values("season").groupby("player_id").tail(1)
+    if len(rows) < 2:
+        return jsonify({"error": "player not found"}), 404
+    probs, fees = predict_batch(rows)
+    out = {}
+    for (_, r), pr, fr in zip(rows.iterrows(), probs, fees):
+        pid = int(r["player_id"])
+        out["a" if pid == pid_a else "b"] = _player_payload(r, round(float(pr) * 100), round(float(fr), 1))
+    pa, pb = out["a"]["prob"], out["b"]["prob"]
+    if abs(pa - pb) < 5:
+        out["verdict"] = "The model sees them as near-equal flight risks this window."
+    else:
+        hi, lo = (out["a"], out["b"]) if pa > pb else (out["b"], out["a"])
+        out["verdict"] = f"The model rates {hi['name']} {'%.1f' % (max(pa,pb)/max(min(pa,pb),1e-6))}x more likely to move ({hi['prob']}% vs {lo['prob']}%)."
+    out["axes"] = [a[0] for a in AXES] + ["Age prime"]
+    return jsonify(out)
+
 @app.route("/backtest")
 def backtest_page():
     return render_template("backtest.html", metrics=metrics, backtest=backtest)
