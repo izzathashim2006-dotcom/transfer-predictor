@@ -6,7 +6,11 @@ Football (soccer) transfer prediction from **real Transfermarkt data** — with 
 > **1)** the probability the player moves clubs in the next window, and
 > **2)** the expected transfer fee in EUR millions.
 
-## 🌐 Web app
+## 🌐 Live website
+
+**https://transfer-predictor-teea.onrender.com** (hosted free on Render — first visit after idle may take ~50s to wake)
+
+## 💻 Run locally
 
 ```bash
 pip install -r requirements.txt
