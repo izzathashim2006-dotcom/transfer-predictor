@@ -52,6 +52,7 @@
 <div class="layout">
   <section class="colmain">
     <div class="intro">
+      <div class="kicker">Model overview</div>
       <h2>Data-Driven Transfer Prediction</h2>
       <p class="lede">The Transfer Predictor estimates the probability and fee of every professional
       footballer's next move — before it happens.</p>
@@ -139,9 +140,25 @@
 </div>
 
 <footer>
-  Models: HistGradientBoosting classifier + log-fee regressor, trained on real Transfermarkt player-scores
-  data. Predictions are estimates — real moves depend on club finances, managers and rumors the data cannot
-  see. News timeline: Sky Sports Transfer Centre. Run locally: <code>python app.py</code>
+  <div class="fcol">
+    <div class="fbrand">FOOTBALL<span>TRANSFER PREDICTOR</span></div>
+    <p>Machine-learning transfer odds built on 56,204 real player-seasons of
+    Transfermarkt data — performance, age, injury history and market context.</p>
+  </div>
+  <div class="fcol">
+    <h5>Explore</h5>
+    <a href="/">Prediction</a>
+    <a href="/backtest">Backtest</a>
+    <a href="/compare">Compare</a>
+    <a href="#news">Transfer news</a>
+  </div>
+  <div class="fcol">
+    <h5>Data &amp; models</h5>
+    <a href="https://github.com/izzathashim2006-dotcom/transfer-predictor">GitHub repository</a>
+    <span>Transfermarkt player-scores dataset</span>
+    <span>Sky Sports Transfer Centre (live rumours)</span>
+    <span>Run locally: <code>python app.py</code></span>
+  </div>
 </footer>
 
 <script src="/static/animate.js"></script>
