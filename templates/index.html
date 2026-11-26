@@ -158,7 +158,7 @@ async function search(q) {
     const d = document.createElement('div');
     d.className = 'resrow';
     d.innerHTML = `<span class="who"><span class="ava sm"><b>${p.name.trim()[0]}</b><img src="/face/${p.pid}" alt="" onerror="this.style.display='none'"></span>
-                   <span><b>${p.name}</b><span>${p.position} · ${p.league} · season ${p.season}</span></span></span>
+                   <span class="rt"><b class="rn">${p.name}</b><span class="rm">${p.position} · ${p.league} · season ${p.season}</span></span></span>
                    <span class="mv">${fmtM(p.mv/1e6)}</span>`;
     d.onclick = () => { box.classList.add('hidden'); $('q').value = p.name; loadPlayer(p.player_id); };
     box.appendChild(d);
