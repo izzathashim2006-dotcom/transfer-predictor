@@ -71,6 +71,26 @@ tr:hover td{background:var(--panel2)}
 .t-md{background:rgba(210,153,34,.15);color:var(--amber)}
 .t-lo{background:rgba(63,185,80,.15);color:var(--green)}
 footer{color:var(--muted);font-size:.8rem;margin-top:36px;border-top:1px solid var(--border);padding-top:16px}
+.dest{background:var(--panel2);border-radius:10px;padding:14px 16px;margin-top:18px}
+.dest h4{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.destchips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.dchip{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:.85rem}
+.dchip b{color:var(--blue)}
+.simlist{font-size:.88rem;color:var(--text)}
+.simlist div{padding:4px 0;border-bottom:1px dashed var(--border)}
+.simlist b{color:var(--green)}
+.rumour{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.rumour h4{font-size:1rem;margin-bottom:6px}
+.rumour .rmeta{font-size:.75rem;color:var(--muted);margin-bottom:8px}
+.rumour .rbody{font-size:.9rem;color:#c9d1d9;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);
+  border-radius:10px;padding:6px 10px;cursor:pointer}
+.chip:hover{border-color:var(--blue)}
+.chip .cn{font-size:.85rem;font-weight:600}
+.chip .cv{font-size:.72rem;color:var(--muted)}
+.rumourwrap{margin-top:8px}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:6px}
 .hidden{display:none}
 </style>
 </head>
@@ -96,6 +116,11 @@ footer{color:var(--muted);font-size:.8rem;margin-top:36px;border-top:1px solid v
     <div class="results hidden" id="results"></div>
   </div>
 
+  <div class="card rumourwrap">
+    <h3><span class="live-dot"></span>Live transfer rumours — with the model's verdict</h3>
+    <div id="rumours"><div class="rmeta">Loading…</div></div>
+  </div>
+
   <div id="predCard" class="card hidden">
     <div class="pred-head">
       <div class="pred-title">
@@ -112,6 +137,11 @@ footer{color:var(--muted);font-size:.8rem;margin-top:36px;border-top:1px solid v
     </div>
     <div class="bar"><i id="pBar"></i></div>
     <div class="stats" id="pStats"></div>
+    <div class="dest" id="pDest">
+      <h4>Predicted destination clubs · most similar past transfers</h4>
+      <div class="destchips" id="pDestChips"></div>
+      <div class="simlist" id="pSims"></div>
+    </div>
   </div>
 
   <div class="grid2">
@@ -151,6 +181,32 @@ footer{color:var(--muted);font-size:.8rem;margin-top:36px;border-top:1px solid v
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
+async function loadRumours() {
+  try {
+    const d = await (await fetch('/api/rumours')).json();
+    const el = document.getElementById('rumours');
+    if (!d.items || !d.items.length) {
+      el.innerHTML = `<div class="rmeta">No player rumours right now${d.error ? ' (' + d.error + ')' : ''} — check back later.</div>`;
+      return;
+    }
+    el.innerHTML = d.items.map(it => `
+      <div class="rumour">
+        <h4>${it.headline}</h4>
+        <div class="rmeta">${(it.time || '').slice(0, 10)} · Sky Sports Transfer Centre</div>
+        <div class="rbody">${it.body.slice(0, 260)}${it.body.length > 260 ? '…' : ''}</div>
+        <div class="chips">${it.players.map(p => `
+          <span class="chip" onclick='loadPlayer(${p.pid}, ${p.season})'>
+            <span class="ava sm"><b>${p.name.trim()[0]}</b><img src="${p.face}" alt="" onerror="this.style.display='none'"></span>
+            <span><span class="cn">${p.name}</span><br>
+            ${p.prob != null ? `<span class="cv">model: ${p.prob}% chance${p.fee >= 0.2 ? ' · ' + fmtM(p.fee) : ''}</span>` : '<span class="cv">not in dataset</span>'}</span>
+          </span>`).join('')}</div>
+      </div>`).join('');
+  } catch (e) {
+    document.getElementById('rumours').innerHTML = '<div class="rmeta">Rumours unavailable (network error).</div>';
+  }
+}
+window.addEventListener('load', loadRumours);
+
 const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
 const $ = id => document.getElementById(id);
 async function search(q) {
@@ -196,6 +252,11 @@ async function loadPlayer(pid, season) {
   el.style.color = pct >= 60 ? 'var(--red)' : pct >= 30 ? 'var(--amber)' : 'var(--green)';
   document.getElementById('pFee').textContent = r.fee >= 0.2 ? fmtM(r.fee) : '—';
   document.getElementById('pBar').style.width = pct + '%';
+  document.getElementById('pDest').style.display = (r.destinations && r.destinations.length) ? '' : 'none';
+  document.getElementById('pDestChips').innerHTML = (r.destinations || []).map(d =>
+    `<span class="dchip">${d.club} <b>×${d.n}</b></span>`).join('');
+  document.getElementById('pSims').innerHTML = (r.similar || []).map(x =>
+    `<div>${x.name} (${x.season}) → <b>${x.club}</b> · EUR ${x.fee.toFixed(1)}M</div>`).join('');
   const trend = r.mv_trend >= 0 ? '+' : '';
   document.getElementById('pStats').innerHTML = [
     ['Apps', r.apps], ['Minutes', r.minutes], ['Goals', r.goals], ['Assists', r.assists],
