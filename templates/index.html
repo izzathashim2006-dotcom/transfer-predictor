@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Transfer Predictor — Real Transfermarkt Data</title>
 <meta property="og:title" content="Football Transfer Predictor">
-<meta property="og:description" content="ML transfer odds for 56,204 real player-seasons — probability, expected fee, why, and live rumours.">
+<meta property="og:description" content="ML transfer odds for real player-seasons (2013–2025) — probability, expected fee, why, and live rumours.">
 <meta property="og:image" content="https://transfer-predictor-teea.onrender.com/assets/og.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
@@ -17,7 +17,7 @@
 </head>
 <body>
 <div class="topbar">
-  <div class="wrap"><span>56,204 real player-seasons · Transfermarkt data</span></div>
+  <div class="wrap"><span>Trained on 2013–2024 · scores through 2025/26 · Transfermarkt data</span></div>
 </div>
 
 <header class="sitehead">
@@ -57,8 +57,8 @@
       <p class="lede">The Transfer Predictor estimates the probability and fee of every professional
       footballer's next move — before it happens.</p>
       <p>Two gradient-boosted machine-learning models are trained on
-      <b>56,204 real player-seasons</b> (2013–2024) built from Transfermarkt data: over 1.9 million
-      match appearances, 175,000 transfer records and full market-value histories.</p>
+      <b>{{ metrics.n_rows|default("56,204") }} real player-seasons</b> (2013–2024) built from Transfermarkt
+      data — and it scores the current 2025/26 season as it happens.</p>
       <p>Each player is scored on <i>on-pitch performance</i> (goals, assists, minutes, per-90 rates),
       <i>age curve</i> (peak odds at ~24–25) and <i>injury history</i> (appearance gaps, availability
       ratio), alongside contract context and 12-month valuation trends.</p>
@@ -73,7 +73,7 @@
 
     <div class="card" id="radar">
     <h3 class="sec">Live transfer radar — top risks right now <span style="font-size:.72rem;color:var(--muted);font-weight:400">(auto-refreshes every 60s)</span></h3>
-    <div class="radar-rows" id="radarRows"><div class="rmeta">Scanning 56,204 player-seasons…</div></div>
+    <div class="radar-rows" id="radarRows"><div class="rmeta">Scanning {{ metrics.n_rows|default("56,204") }} player-seasons…</div></div>
   </div>
 
   <div id="predCard" class="card hidden">
@@ -142,7 +142,7 @@
 <footer>
   <div class="fcol">
     <div class="fbrand">FOOTBALL<span>TRANSFER PREDICTOR</span></div>
-    <p>Machine-learning transfer odds built on 56,204 real player-seasons of
+    <p>Machine-learning transfer odds built on real player-seasons (2013–2025) of
     Transfermarkt data — performance, age, injury history and market context.</p>
   </div>
   <div class="fcol">

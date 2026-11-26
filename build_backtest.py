@@ -30,6 +30,7 @@ def norm(s):
 
 def main():
     df = pd.read_csv("data/real_players.csv")
+    df = df[df["season"] <= 2024].reset_index(drop=True)
     X = prep(df)
     print("Cross-validating on", len(df), "player-seasons (this takes a few minutes)...")
     clf = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.08,

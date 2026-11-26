@@ -114,7 +114,7 @@ def value_asof(season_end):
     return v.groupby("player_id")["market_value_in_eur"].last()
 
 mv_now = value_asof(pd.Timestamp("2030-01-01"))  # last known valuation
-for y in range(2012, 2026):
+for y in range(2012, 2027):
     end = pd.Timestamp(f"{y+1}-06-30")
     yr = end.year
     perf.loc[perf["season"] == yr - 1, "mv_eur"] = perf.loc[perf["season"] == yr - 1, "player_id"].map(value_asof(end))
@@ -129,7 +129,7 @@ tr = pd.read_csv(f"{RAW}/transfers.csv",
                  usecols=["player_id", "transfer_date", "transfer_fee", "transfer_season"],
                  dtype={"player_id": "int32", "transfer_fee": "float64"}, parse_dates=["transfer_date"])
 tr = tr[tr["from_club_id"] != tr["to_club_id"]] if "from_club_id" in tr.columns else tr
-tr = tr[(tr["transfer_date"] >= "2013-01-01") & (tr["transfer_date"] <= "2026-02-28")]
+tr = tr[(tr["transfer_date"] >= "2013-01-01") & (tr["transfer_date"] <= "2027-02-28")]
 
 # window after season end: 1 June (Y+1) -> 28 Feb (Y+2)
 tr["season"] = np.where(tr["transfer_date"].dt.month >= 7, tr["transfer_date"].dt.year - 1,
@@ -166,7 +166,7 @@ perf["assists_per90"] = (perf["assists"] / perf["minutes"] * 90).round(3)
 
 # ---------------------------------------------------------------- filter + save
 df = perf[(perf["apps"] >= 10) & (perf["minutes"] >= 450) &
-          (perf["season"].between(2013, 2024)) & perf["mv_eur"].notna() &
+          (perf["season"].between(2013, 2025)) & perf["mv_eur"].notna() &
           perf["position"].notna()].copy()
 df = df[["player_id", "name", "season", "position", "sub_position", "foot", "height_in_cm",
          "age", "league", "apps", "minutes", "goals", "assists", "goals_per90", "assists_per90",

@@ -2,7 +2,7 @@
 
 Football (soccer) transfer prediction from **real Transfermarkt data** — with a live web app.
 
-> Two gradient-boosted models estimate, for any of 56,204 real player-seasons (2013–2024):
+> Two gradient-boosted models estimate, for any of 61,185 real player-seasons (2013–2025):
 > **1)** the probability the player moves clubs in the next window, and
 > **2)** the expected transfer fee in EUR millions.
 
@@ -37,9 +37,13 @@ build_real_dataset.py    Builds player-season features from raw Transfermarkt CS
 train_real_model.py      Trains classifier + fee regressor, CV metrics
 predict_real.py          CLI: python predict_real.py --name "Bellingham" --season 2022
 rumours.py               Sky Sports rumours fetcher + player matcher
-data/real_players.csv    56,204 real player-seasons (committed, 7.7 MB)
+data/real_players.csv    61,185 real player-seasons (committed)
 generate_dataset.py      Legacy synthetic-data pipeline (kept for experiments)
 ```
+
+> **Training window note:** models train on completed seasons 2013–2024; the current
+> 2025/26 season is scored live on the site but never used for training (its transfer
+> outcomes aren't known yet — no leakage).
 
 ## 🔢 The models
 

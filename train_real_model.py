@@ -37,6 +37,9 @@ def main():
     df = pd.read_csv("data/real_players.csv")
     X = prep(df)
     Path("model").mkdir(exist_ok=True)
+    # train on completed seasons only; the in-progress season is scored but never trained on
+    train_mask = df["season"] <= 2024
+    df, X = df[train_mask].reset_index(drop=True), X[train_mask].reset_index(drop=True)
 
     # ---- classifier ----
     clf = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.08, class_weight={0: 1, 1: 2}, random_state=42)
