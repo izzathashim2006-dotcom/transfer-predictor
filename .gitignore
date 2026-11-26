@@ -1,1 +1,4 @@
 model/
+data/raw/
+data/real_players.csv
+data/players.csv
