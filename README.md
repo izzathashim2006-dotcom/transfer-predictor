@@ -27,6 +27,7 @@ FootballTransfers-style UI with:
 | 📊 Prediction card | Transfer probability, expected fee, season stats, availability & injury-gap metrics, market-value trend |
 | 🏟️ Destination clubs | kNN over 1,200+ real past transfers — "most similar historical moves and where they went" |
 | 🔴 Live rumours | Sky Sports Transfer Centre feed, player-matched, each with the model's verdict |
+| 🧭 Club Scout | Pick any club — get best-fit targets ranked by that club's historical signing profile |
 | 🔄 Latest moves | Real completed transfers from the current window, each with the model's retrospective verdict |
 | 📈 Charts | Transfer rate by age/league, feature importance, fee distribution |
 | ☀️ / 🌙 | Light/dark theme, follows OS preference, persisted |

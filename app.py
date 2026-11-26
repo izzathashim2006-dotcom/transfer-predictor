@@ -167,7 +167,97 @@ def index():
     return render_template("index.html", metrics=metrics, importance=importance,
                            chart=chart, top_risk=top_risk_rows(12))
 
-# ---- percentile lookups for the comparison radar ----
+# ---- club scout: recommend targets by a club's historical signing profile ----
+_SCOUT_VEC = ["age", "minutes", "goals_per90", "assists_per90", "availability",
+              "longest_gap_days", "log1p_mv", "mv_trend_12m", "int_apps"]
+
+def _vec(r):
+    return np.array([float(r["age"]), float(r["minutes"]), float(r["goals_per90"]),
+                     float(r["assists_per90"]), float(r["availability"]),
+                     float(r["longest_gap_days"]), np.log1p(float(r["market_value_eur"])),
+                     float(r["mv_trend_12m"]) if not pd.isna(r["mv_trend_12m"]) else 0.0,
+                     float(r["int_apps"])])
+
+_last_move = (player_transfers.sort_values("date").groupby("player_id").tail(1)[["player_id", "to_club"]]
+              if not player_transfers.empty else pd.DataFrame(columns=["player_id", "to_club"]))
+_last_move = dict(zip(_last_move["player_id"].astype(int), _last_move["to_club"]))
+_df_key = {(int(r["player_id"]), int(r["season"])): i for i, r in df.iterrows()}
+_club_counts = (player_transfers.groupby("to_club").size().sort_values(ascending=False)
+                if not player_transfers.empty else pd.Series(dtype=int))
+_names_map = dict(zip(df["player_id"].astype(int), df["name"]))
+
+@app.route("/scout")
+def scout_page():
+    return render_template("scout.html", metrics=metrics)
+
+@app.route("/api/clubs")
+def api_clubs():
+    q = request.args.get("q", "").strip().lower()
+    norm = lambda s: str(s).encode("ascii", "ignore").decode("ascii").lower()
+    clubs = [(c, int(n)) for c, n in _club_counts.items() if len(c) > 2]
+    if q:
+        clubs = [(c, n) for c, n in clubs if q in norm(c)]
+    return jsonify([{"club": c, "n": n} for c, n in clubs[:10]])
+
+@app.route("/api/scout")
+def api_scout():
+    club = request.args.get("club", "").strip()
+    if not club:
+        return jsonify({"error": "need ?club="}), 400
+    signings = player_transfers[player_transfers["to_club"] == club]
+    if len(signings) < 2:
+        return jsonify({"error": "not enough signings in dataset for this club"}), 404
+    sig_rows, keep = [], []
+    for _, t in signings.iterrows():
+        i = _df_key.get((int(t["player_id"]), int(np.where(t["date"].month >= 7, t["date"].year - 1, t["date"].year - 2))))
+        if i is not None:
+            sig_rows.append(df.loc[i])
+            keep.append(i)
+    sigs = pd.DataFrame(sig_rows)
+    src_leagues = sigs["league"].value_counts().head(3).index.tolist()
+    sig_vecs = np.array([_vec(r) for _, r in sigs.iterrows()])
+    centroid = np.median(sig_vecs, axis=0)
+
+    pool = df[(df["season"] >= 2024) & (df["apps"] >= 10)].copy()
+    pool["log1p_mv"] = np.log1p(pool["market_value_eur"])
+    pool = pool[[(_last_move.get(int(r["player_id"])) != club) for _, r in pool.iterrows()]]
+    P = np.array([_vec(r) for _, r in pool.iterrows()])
+    std = P.std(axis=0); std[std == 0] = 1
+    d = (((P - centroid) / std) ** 2).sum(axis=1)
+    # pipeline bonus: clubs re-sign from leagues they know
+    lg = pool["league"].isin(src_leagues).values
+    d = d * np.where(lg, 0.8, 1.0)
+    order = np.argsort(d)[:18]
+    cands = pool.iloc[order]
+    pr, fr = predict_batch(cands)
+    cands = cands.assign(_pr=pr, _fr=fr)
+    out = []
+    for (_, r), dist in zip(cands.iterrows(), d[order]):
+        axes = {"age": "prime age", "minutes": "big minutes", "goals_per90": "goal threat",
+                "assists_per90": "creator profile", "availability": "durability",
+                "market_value_eur": "value band", "int_apps": "int'l pedigree"}
+        fits = []
+        for col, label in axes.items():
+            cv_ = centroid[_SCOUT_VEC.index("log1p_mv")] if col == "market_value_eur" else centroid[_SCOUT_VEC.index(col)]
+            v = np.log1p(float(r["market_value_eur"])) if col == "market_value_eur" else float(r[col])
+            if abs(v - cv_) <= 0.6 * std[_SCOUT_VEC.index("log1p_mv" if col == "market_value_eur" else col)]:
+                fits.append(label)
+        out.append({"pid": int(r["player_id"]), "name": r["name"], "age": float(r["age"]),
+                    "league": r["league"], "position": r["position"], "mv": float(r["market_value_eur"]),
+                    "prob": round(float(r["_pr"]) * 100), "fee": round(float(r["_fr"]), 1),
+                    "face": f"/face/{int(r['player_id'])}", "dist": round(float(dist), 2),
+                    "fits": fits[:3]})
+    recent = signings.sort_values("date", ascending=False).head(6)
+    return jsonify({"club": club, "n_signings": int(len(signings)),
+                    "median_age": round(float(sig_vecs[:, 0].mean()), 1),
+                    "source_leagues": src_leagues,
+                    "recent": [{"pid": int(t["player_id"]),
+                                "name": _names_map.get(int(t["player_id"]), "Unknown"),
+                                "when": t["date"].strftime("%b %Y"),
+                                "from": t["from_club"], "fee": round(float(t["fee_millions"]), 1)}
+                               for _, t in recent.iterrows()],
+                    "targets": sorted(out, key=lambda x: (-x["prob"] / 100, x["dist"]))[:12]})
+
 AXES = [
     ("Goal threat", "goals_per90", False),
     ("Creativity", "assists_per90", False),

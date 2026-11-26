@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Club Scout — who should your club sign? | Transfer Predictor</title>
+<meta property="og:title" content="Club Scout — who should your club sign?">
+<meta property="og:description" content="Best-fit transfer targets ranked by your club's historical signing profile.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+.scout-pick{display:flex;gap:12px;margin-bottom:20px;position:relative}
+.scout-pick input{flex:1;padding:13px 16px;font-size:1rem;background:var(--panel);
+  border:1px solid var(--border);border-radius:10px;color:var(--text);outline:none}
+.scout-pick input:focus{border-color:var(--accent)}
+.club-results{position:absolute;top:100%;left:0;right:0;background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;margin-top:6px;z-index:30;max-height:300px;overflow-y:auto;box-shadow:var(--card-shadow)}
+.club-results div{padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between}
+.club-results div:hover{background:var(--hover)}
+.club-results .n{color:var(--muted);font-size:.8rem}
+.club-summary{display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:var(--panel2);
+  border-radius:12px;padding:14px 18px;margin-bottom:20px}
+.club-summary .cs{font-size:.85rem}
+.club-summary .cs b{color:var(--accent)}
+.targets{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.tcard{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease}
+.tcard:hover{transform:translateY(-4px);box-shadow:var(--card-shadow)}
+.tcard .ttop{display:flex;gap:12px;align-items:center}
+.tcard .nm{font-weight:700}
+.tcard .mt{font-size:.76rem;color:var(--muted)}
+.tcard .odds{margin-top:10px;font-size:1.25rem;font-weight:800}
+.tcard .odds small{font-size:.7rem;color:var(--muted);font-weight:400;display:block}
+.tcard .fits{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.tcard .fits span{font-size:.68rem;background:rgba(14,138,114,.12);color:var(--accent);
+  padding:2px 8px;border-radius:10px;font-weight:600}
+.recent{font-size:.84rem}
+.recent div{padding:4px 0;border-bottom:1px dashed var(--border)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap"><span id="windowCount"></span></div>
+</div>
+
+<header class="sitehead">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="">
+    <div class="brandname">Football<span>Transfer Predictor</span></div></a>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark mode" style="margin-left:auto"></button>
+  </div>
+</header>
+
+<nav class="mainnav">
+  <div class="wrap">
+    <a href="/">Prediction</a>
+    <a href="/backtest">Backtest</a>
+    <a href="/compare">Compare</a>
+    <a href="/scout" style="color:#fff;background:rgba(255,255,255,.08)">Club Scout</a>
+    <a href="/#news">Transfer News</a>
+  </div>
+</nav>
+
+<div class="crumbs"><div class="wrap">Home <span class="sep">›</span> <b>Club Scout</b></div></div>
+
+<div class="single">
+  <div class="intro">
+    <div class="kicker">Who should your club sign?</div>
+    <h2>Club Scout</h2>
+    <p class="lede">Pick any club. The model builds that club's historical signing profile
+    (every player they bought since 2013) and ranks the market's best available fits.</p>
+  </div>
+
+  <div class="card">
+    <div class="scout-pick">
+      <input id="club" placeholder="Club — e.g. Brighton, Ajax, Real Madrid" autocomplete="off">
+      <div class="club-results hidden" id="clubRes"></div>
+    </div>
+    <div id="summary" class="club-summary hidden"></div>
+    <div id="targets" class="targets hidden"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="fcol">
+    <div class="fbrand">FOOTBALL<span>TRANSFER PREDICTOR</span></div>
+    <p>Machine-learning transfer odds built on real player-seasons of Transfermarkt data.</p>
+  </div>
+  <div class="fcol">
+    <h5>Explore</h5>
+    <a href="/">Prediction</a><a href="/backtest">Backtest</a><a href="/compare">Compare</a><a href="/scout">Club Scout</a>
+  </div>
+  <div class="fcol">
+    <h5>Data &amp; models</h5>
+    <a href="https://github.com/izzathim2006-dotcom/transfer-predictor">GitHub repository</a>
+    <span>Transfermarkt player-scores dataset</span>
+    <span>Run locally: <code>python app.py</code></span>
+  </div>
+</footer>
+
+<script src="/static/countdown.js"></script>
+<script src="/static/animate.js"></script>
+<script>
+const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
+const $ = id => document.getElementById(id);
+const ICONS = {
+  sun: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  moon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
+const themeBtn = $('themeBtn');
+document.documentElement.dataset.theme = localStorage.getItem('theme') ||
+  (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+themeBtn.innerHTML = ICONS[document.documentElement.dataset.theme === 'light' ? 'moon' : 'sun'];
+themeBtn.onclick = () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  themeBtn.innerHTML = ICONS[next === 'light' ? 'moon' : 'sun'];
+};
+
+let t;
+$('club').addEventListener('input', e => {
+  clearTimeout(t);
+  t = setTimeout(async () => {
+    const q = e.target.value.trim();
+    const box = $('clubRes');
+    if (q.length < 2) { box.classList.add('hidden'); return; }
+    const list = await (await fetch('/api/clubs?q=' + encodeURIComponent(q))).json();
+    box.innerHTML = '';
+    box.classList.toggle('hidden', !list.length);
+    list.forEach(c => {
+      const d = document.createElement('div');
+      d.innerHTML = `<span><b>${c.club}</b></span><span class="n">${c.n} signings since 2013</span>`;
+      d.onclick = () => { box.classList.add('hidden'); $('club').value = c.club; scout(c.club); };
+      box.appendChild(d);
+    });
+  }, 250);
+});
+document.addEventListener('click', e => { if (!e.target.closest('.scout-pick')) $('clubRes').classList.add('hidden'); });
+
+async function scout(club) {
+  const d = await (await fetch('/api/scout?club=' + encodeURIComponent(club))).json();
+  if (d.error) {
+    $('summary').classList.remove('hidden');
+    $('summary').innerHTML = `<span class="cs">Not enough signing history for <b>${club}</b> in our data.</span>`;
+    $('targets').classList.add('hidden');
+    return;
+  }
+  $('summary').classList.remove('hidden');
+  $('summary').innerHTML = `
+    <span class="cs"><b>${d.club}</b> — ${d.n_signings} paid signings since 2013</span>
+    <span class="cs">typical age at signing: <b>${d.median_age}</b></span>
+    <span class="cs">usual shopping leagues: <b>${d.source_leagues.join(', ')}</b></span>`;
+  $('targets').classList.remove('hidden');
+  $('targets').innerHTML = d.targets.map(x => `
+    <div class="tcard" onclick="location.href='/player/${x.pid}'">
+      <div class="ttop">
+        <span class="ava sm"><b>${(x.name || '?').trim()[0]}</b><img src="${x.face}" alt="" onerror="this.style.display='none'"></span>
+        <div style="min-width:0">
+          <div class="nm">${x.name}</div>
+          <div class="mt">${x.position} · ${x.league} · age ${x.age.toFixed(1)} · ${fmtM(x.mv/1e6)}</div>
+        </div>
+      </div>
+      <div class="odds" style="color:var(--${x.prob >= 50 ? 'green' : x.prob >= 30 ? 'amber' : 'red'})">${x.prob}%
+        <small>chance to move · ${x.fee >= 0.2 ? fmtM(x.fee) + ' est.' : ''}</small></div>
+      <div class="fits">${x.fits.map(f => `<span>✓ ${f}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+window.addEventListener('load', () => {
+  const usp = new URLSearchParams(location.search);
+  const c = usp.get('club');
+  if (c) { $('club').value = c; scout(c); }
+});
+</script>
+</body>
+</html>
