@@ -21,6 +21,8 @@ FootballTransfers-style UI with:
 
 | Feature | Description |
 |---|---|
+| 👤 Player profiles | Per-player page: market value vs odds curve, every season scored, transfer history, why-waterfall |
+| ⏱️ Window countdown | Live open/closed state with real FIFA window dates |
 | 🔎 Player search | Any player in the dataset, fuzzy + accent-insensitive, with official Transfermarkt portraits |
 | 📊 Prediction card | Transfer probability, expected fee, season stats, availability & injury-gap metrics, market-value trend |
 | 🏟️ Destination clubs | kNN over 1,200+ real past transfers — "most similar historical moves and where they went" |
@@ -32,7 +34,8 @@ FootballTransfers-style UI with:
 ## 📁 Project layout
 
 ```
-app.py                   Flask web app (search, predict, rumours, faces, latest moves)
+app.py                   Flask web app (search, predict, rumours, faces, latest moves, profiles)
+build_player_transfers.py Builds per-player transfer history for profile pages
 build_transfers_feed.py  Builds the latest-completed-transfers feed
 templates/index.html     Single-page UI
 build_real_dataset.py    Builds player-season features from raw Transfermarkt CSVs

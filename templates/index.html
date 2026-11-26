@@ -17,7 +17,7 @@
 </head>
 <body>
 <div class="topbar">
-  <div class="wrap"><span>Trained on 2013–2024 · scores through 2025/26 · Transfermarkt data</span></div>
+  <div class="wrap"><span id="windowCount"></span> · <span>id="windowCount"></span> · <spanspan>Trained on 2013–2024 · scores through 2025/26 · Transfermarkt data</span></div>
 </div>
 
 <header class="sitehead">
@@ -89,6 +89,7 @@
           <div>
             <h2 id="pName"></h2>
             <div class="meta" id="pMeta"></div>
+            <a id="pProfile" class="dchip" href="#" style="display:none;text-decoration:none;margin-top:8px;font-size:.78rem;font-weight:600">Full profile &amp; career odds →</a>
           </div>
         </div>
         <div class="gauge">
@@ -207,6 +208,8 @@ async function loadPlayer(pid, season) {
   const parts = r.name.trim().split(/\s+/);
   $('pInitials').textContent = parts[0][0] + (parts.length > 1 ? parts[parts.length-1][0] : '');
   $('pName').textContent = r.name;
+  const prof = $('pProfile');
+  prof.style.display = ''; prof.href = '/player/' + r.face.split('/face/')[1];
   $('pMeta').textContent =
     `${r.position} · ${r.league} · season ${r.season} · age ${r.age.toFixed(1)}` +
     (r.seasons.length > 1 ? ` — other seasons available: ${r.seasons.join(', ')}` : '');
@@ -254,7 +257,7 @@ async function loadLatest() {
       const verdict = r.pred_prob != null
         ? `<span class="ltv ${r.pred_prob >= 50 ? 'hi' : r.pred_prob >= 30 ? 'md' : 'lo'}">model: ${r.pred_prob}%${r.pred_fee ? ' · ' + fmtM(r.pred_fee) : ''}</span>`
         : '<span class="ltv na">not in model</span>';
-      return `<div class="lt-row">
+      return `<div class="lt-row" onclick="location.href='/player/${r.pid}'">
         <span class="ava sm"><b>${(r.name || '?').trim()[0]}</b><img src="${r.face}" alt="" onerror="this.style.display='none'"></span>
         <span class="lt-main"><b>${r.name}</b><i>${r.from} <em>➜</em> ${r.to}</i></span>
         <span class="lt-fee">${r.fee >= 1 ? fmtM(r.fee) : 'EUR ' + r.fee.toFixed(1) + 'M'}</span>
@@ -383,5 +386,6 @@ themeBtn.onclick = () => {
 if (typeof Chart !== 'undefined') initCharts();
 else window.addEventListener('load', initCharts);
 </script>
+<script src="/static/countdown.js"></script>
 </body>
 </html>

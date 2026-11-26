@@ -18,7 +18,7 @@
 </head>
 <body>
 <div class="topbar">
-  <div class="wrap"><span>Every probability on this page comes from a model that never saw that season during training</span></div>
+  <div class="wrap"><span id="windowCount"></span> · <span>id="windowCount"></span> · <spanspan>Every probability on this page comes from a model that never saw that season during training</span></div>
 </div>
 
 <header class="sitehead">
@@ -180,5 +180,6 @@ window.addEventListener('load', () => {
   if (window.__animateCount) document.querySelectorAll('.metric .v').forEach(v => __animateCount(v, 900));
 });
 </script>
+<script src="/static/countdown.js"></script>
 </body>
 </html>

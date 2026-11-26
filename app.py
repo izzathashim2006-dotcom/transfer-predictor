@@ -61,6 +61,9 @@ chart = {
 
 latest = df.sort_values("season").drop_duplicates("player_id", keep="last")
 
+_pt_path = Path("data/player_transfers.csv")
+player_transfers = pd.read_csv(_pt_path, dtype={"player_id": "int32"}, parse_dates=["date"]) if _pt_path.exists() else pd.DataFrame()
+
 _lt_path = Path("data/latest_transfers.csv")
 latest_transfers = pd.read_csv(_lt_path, dtype={"player_id": "int32"}) if _lt_path.exists() else pd.DataFrame()
 
@@ -202,6 +205,39 @@ def _player_payload(r, prob, fee):
                       ["Longest injury gap", str(int(r["longest_gap_days"])) + "d"],
                       ["Value trend 12m", ("+" if r["mv_trend_12m"] >= 0 else "") + str(int(round(float(r["mv_trend_12m"]) * 100))) + "%"]],
             "axes": axis_scores(r)}
+
+@app.route("/player/<int:pid>")
+def player_page(pid):
+    rows = df[df["player_id"] == pid].sort_values("season")
+    if rows.empty:
+        return render_template("404.html"), 404
+    probs, fees = predict_batch(rows)
+    seasons = []
+    for (_, r), pr, fr in zip(rows.iterrows(), probs, fees):
+        seasons.append({
+            "season": int(r["season"]), "league": r["league"], "position": r["position"],
+            "apps": int(r["apps"]), "minutes": int(r["minutes"]), "goals": int(r["goals"]),
+            "assists": int(r["assists"]), "availability": round(float(r["availability"]) * 100),
+            "gap": int(r["longest_gap_days"]), "int_apps": int(r["int_apps"]),
+            "mv": float(r["market_value_eur"]), "trend": float(r["mv_trend_12m"]),
+            "prob": round(float(pr) * 100), "fee": round(float(fr), 1),
+        })
+    latest = rows.iloc[-1]
+    hist = player_transfers[player_transfers["player_id"] == pid] if not player_transfers.empty else pd.DataFrame()
+    transfers = [{"date": r["date"].strftime("%b %Y"), "from": r["from_club"], "to": r["to_club"],
+                  "fee": float(r["fee_millions"])} for _, r in hist.iterrows()]
+    payload = {
+        "pid": pid, "name": latest["name"], "position": latest["position"],
+        "league": latest["league"], "age": float(latest["age"]),
+        "mv": float(latest["market_value_eur"]),
+        "face": f"/face/{pid}",
+        "foot": latest["foot"], "height": None if pd.isna(latest["height_cm"]) else int(latest["height_cm"]),
+        "seasons": seasons, "transfers": transfers,
+        "why": why_contributions(latest),
+        "latest_prob": seasons[-1]["prob"], "latest_fee": seasons[-1]["fee"],
+        "latest_season": seasons[-1]["season"],
+    }
+    return render_template("player.html", payload=payload, metrics=metrics)
 
 @app.route("/compare")
 def compare_page():

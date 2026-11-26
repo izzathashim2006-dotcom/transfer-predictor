@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ payload.name }} — profile | Transfer Predictor</title>
+<meta property="og:title" content="{{ payload.name }} — Transfer Predictor profile">
+<meta property="og:description" content="Career transfer odds, market value curve, stats and transfer history.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+.pp-head{display:flex;gap:20px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.pp-head .ava{width:96px;height:96px}
+.pp-head h2{font-size:1.7rem;letter-spacing:-.01em}
+.pp-meta{color:var(--muted);font-size:.9rem;margin-top:2px}
+.pp-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pp-chips .dchip{font-size:.8rem}
+.pp-verdict{margin-left:auto;text-align:center;background:var(--panel2);border-radius:12px;padding:12px 20px}
+.pp-verdict .v{font-size:2.2rem;font-weight:800}
+.pp-verdict .l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.pp-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start;margin-bottom:24px}
+@media(max-width:760px){.pp-grid{grid-template-columns:1fr}}
+.pp-timeline{display:flex;flex-direction:column}
+.pp-t{display:grid;grid-template-columns:76px 1fr auto;gap:10px;align-items:center;padding:6px 0;
+  border-bottom:1px dashed var(--border);font-size:.88rem}
+.pp-t .d{color:var(--muted);font-size:.76rem}
+.pp-t b{font-weight:600}
+.pp-t .fee{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+.pp-stats td{font-size:.85rem}
+.pp-stats td:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
+.pp-probbar{height:8px;border-radius:4px;background:var(--bar-track);overflow:hidden;min-width:60px}
+.pp-probbar i{display:block;height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--green),var(--amber) 55%,var(--red))}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap"><span id="windowCount"></span></div>
+</div>
+
+<header class="sitehead">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img src="/assets/logo.svg" alt="">
+      <div class="brandname">Football<span>Transfer Predictor</span></div>
+    </a>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark mode" style="margin-left:auto"></button>
+  </div>
+</header>
+
+<nav class="mainnav">
+  <div class="wrap">
+    <a href="/">Prediction</a>
+    <a href="/backtest">Backtest</a>
+    <a href="/compare">Compare</a>
+    <a href="/#news">Transfer News</a>
+    <a href="/#moves">Latest Moves</a>
+  </div>
+</nav>
+
+<div class="crumbs"><div class="wrap">Home <span class="sep">›</span> <b>{{ payload.name }}</b></div></div>
+
+<div class="single">
+  <div class="card">
+    <div class="pp-head">
+      <span class="ava"><b>{{ payload.name[0] }}</b><img src="{{ payload.face }}" alt="" onerror="this.style.display='none'"></span>
+      <div>
+        <h2>{{ payload.name }}</h2>
+        <div class="pp-meta">{{ payload.position }} · {{ payload.league }} · age {{ "%.1f"|format(payload.age) }}
+          {% if payload.height %}· {{ payload.height }}cm{% endif %} {% if payload.foot %}· {{ payload.foot }}-footed{% endif %}
+          · value EUR {{ "%.1f"|format(payload.mv/1000000) }}M</div>
+        <div class="pp-chips">
+          <span class="dchip">Season {{ payload.latest_season }}</span>
+          <a class="dchip" href="/?p={{ payload.pid }}&s={{ payload.latest_season }}">Open prediction card →</a>
+        </div>
+      </div>
+      <div class="pp-verdict">
+        <div class="v" style="color:var(--{{ 'green' if payload.latest_prob >= 50 else 'amber' if payload.latest_prob >= 30 else 'red' }})">{{ payload.latest_prob }}%</div>
+        <div class="l">chance to move</div>
+        <div class="l">est. EUR {{ "%.1f"|format(payload.latest_fee) }}M</div>
+      </div>
+    </div>
+
+    <div class="why-rows" id="whyRows">
+      {% for w in payload.why[:5] %}
+      {% if w.pts | abs >= 0.5 %}
+      <div class="why-row">
+        <span class="wl">{{ w.label }}</span>
+        <span class="wbar"><i class="{{ 'up' if w.pts >= 0 else 'down' }}" style="{{ 'left:50%' if w.pts >= 0 else 'right:50%' }};width:0" data-w="{{ ((w.pts|abs) / 30 * 50) | round(1) }}"></i><b class="tick"></b></span>
+        <span class="wpts {{ 'up' if w.pts >= 0 else 'down' }}">{{ '+' if w.pts >= 0 else '' }}{{ "%.1f"|format(w.pts) }} pts</span>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="pp-grid">
+    <div class="card" style="margin:0">
+      <h3 class="sec">Market value vs transfer odds, season by season</h3>
+      <canvas id="curve" height="200"></canvas>
+    </div>
+    <div class="card" style="margin:0">
+      <h3 class="sec">Transfer history</h3>
+      <div class="pp-timeline">
+        {% for t in payload.transfers %}
+        <div class="pp-t"><span class="d">{{ t.date }}</span><span><b>{{ t.from }}</b> ➜ <b>{{ t.to }}</b></span><span class="fee">EUR {{ "%.1f"|format(t.fee) }}M</span></div>
+        {% else %}
+        <div class="nbody">No paid transfers recorded in the dataset window.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">Every season, scored</h3>
+    <table class="cmp-stats pp-stats">
+      <thead><tr><th>Season</th><th>League</th><th>Apps</th><th>G</th><th>A</th><th>Avail.</th><th>Int'l</th><th>Value</th><th>Odds</th></tr></thead>
+      <tbody>
+        {% for s in payload.seasons %}
+        <tr>
+          <td><b>{{ s.season }}</b></td><td>{{ s.league }}</td><td>{{ s.apps }}</td><td>{{ s.goals }}</td><td>{{ s.assists }}</td>
+          <td>{{ s.availability }}%</td><td>{{ s.int_apps }}</td><td>EUR {{ "%.1f"|format(s.mv/1000000) }}M</td>
+          <td><div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+            <span class="pp-probbar"><i style="width:{{ s.prob }}%"></i></span>{{ s.prob }}%</div></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:12px">Probabilities are the model's estimate from each season's data —
+    older seasons are backtests, the last row is the live call. Why-bars above explain the latest one.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="fcol">
+    <div class="fbrand">FOOTBALL<span>TRANSFER PREDICTOR</span></div>
+    <p>Machine-learning transfer odds built on real player-seasons of
+    Transfermarkt data — performance, age, injury history and market context.</p>
+  </div>
+  <div class="fcol">
+    <h5>Explore</h5>
+    <a href="/">Prediction</a>
+    <a href="/backtest">Backtest</a>
+    <a href="/compare">Compare</a>
+    <a href="/#news">Transfer news</a>
+  </div>
+  <div class="fcol">
+    <h5>Data &amp; models</h5>
+    <a href="https://github.com/izzathashim2006-dotcom/transfer-predictor">GitHub repository</a>
+    <span>Transfermarkt player-scores dataset</span>
+    <span>Sky Sports Transfer Centre (live rumours)</span>
+    <span>Run locally: <code>python app.py</code></span>
+  </div>
+</footer>
+
+<script src="/static/countdown.js"></script>
+<script src="/static/animate.js"></script>
+<script>
+const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
+const $ = id => document.getElementById(id);
+const ICONS = {
+  sun: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  moon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
+const themeBtn = $('themeBtn');
+document.documentElement.dataset.theme = localStorage.getItem('theme') ||
+  (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+themeBtn.innerHTML = ICONS[document.documentElement.dataset.theme === 'light' ? 'moon' : 'sun'];
+themeBtn.onclick = () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  themeBtn.innerHTML = ICONS[next === 'light' ? 'moon' : 'sun'];
+  drawCurve();
+};
+
+const seasons = {{ payload.seasons|tojson }};
+function drawCurve() {
+  const cs = getComputedStyle(document.documentElement);
+  Chart.defaults.color = cs.getPropertyValue('--muted').trim();
+  new Chart($('curve'), {
+    data: {
+      labels: seasons.map(s => s.season),
+      datasets: [
+        {type: 'bar', label: 'market value (EUR M)', data: seasons.map(s => +(s.mv/1e6).toFixed(1)),
+         backgroundColor: 'rgba(76,141,255,.45)', yAxisID: 'y'},
+        {type: 'line', label: 'model odds (%)', data: seasons.map(s => s.prob),
+         borderColor: '#2dd4a8', backgroundColor: 'rgba(45,212,168,.15)', tension: .35, fill: true, yAxisID: 'y1'}
+      ]
+    },
+    options: {plugins: {legend: {labels: {boxWidth: 12}}},
+      scales: {
+        x: {grid: {display: false}},
+        y: {position: 'left', grid: {color: cs.getPropertyValue('--border').trim()}, beginAtZero: true, title: {display: true, text: 'EUR M'}},
+        y1: {position: 'right', grid: {display: 'none'}, beginAtZero: true, max: 100, title: {display: true, text: '% chance'}}
+      }}
+  });
+  document.querySelectorAll('.wbar i').forEach(i => i.style.width = i.dataset.w + '%');
+}
+window.addEventListener('load', () => typeof Chart !== 'undefined' && drawCurve());
+</script>
+</body>
+</html>
