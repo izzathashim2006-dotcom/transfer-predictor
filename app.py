@@ -10,7 +10,7 @@ import urllib.request
 from pathlib import Path
 from flask import Flask, jsonify, render_template, request, send_from_directory, send_file, abort
 
-from train_real_model import prep, CATS
+from train_real_model import prep, CATS, FEATURES
 import rumours as rumours_mod
 
 RAW = "data/raw"
@@ -61,32 +61,21 @@ chart = {
 latest = df.sort_values("season").drop_duplicates("player_id", keep="last")
 rumours_mod.NAME_INDEX = rumours_mod._name_index(latest)
 
-# ---- comparable transfers (kNN over real past transfers) ----
-from sklearn.preprocessing import StandardScaler
-_tr = pd.read_csv(f"{RAW}/transfers.csv",
-                  usecols=["player_id", "transfer_date", "transfer_fee", "to_club_name"],
-                  dtype={"player_id": "int32", "transfer_fee": "float64"}, parse_dates=["transfer_date"])
-_tr = _tr[(_tr["transfer_date"] >= "2013-01-01") & (_tr["transfer_date"] <= "2026-02-28")]
-_tr["season"] = np.where(_tr["transfer_date"].dt.month >= 7, _tr["transfer_date"].dt.year - 1,
-                         _tr["transfer_date"].dt.year - 2)
-_tr = _tr[((_tr["transfer_date"].dt.month >= 6) & (_tr["transfer_date"].dt.year == _tr["season"] + 1)) |
-          ((_tr["transfer_date"].dt.month <= 2) & (_tr["transfer_date"].dt.year == _tr["season"] + 2))]
-_tr = _tr[_tr["transfer_fee"] > 0].sort_values("transfer_fee", ascending=False)
-_dest = _tr.drop_duplicates(["player_id", "season"])[["player_id", "season", "to_club_name"]]
-moved = df[df["transferred"] == 1].merge(_dest, on=["player_id", "season"], how="inner")
-Xk = prep(moved)
-for c in CATS:
-    Xk[c] = Xk[c].cat.codes
-_scaler = StandardScaler().fit(Xk)
-Xk = _scaler.transform(Xk)
-
+# ---- comparable transfers (kNN over real past transfers, precomputed) ----
+_knn_meta = pd.read_csv("data/knn_transfers.csv", dtype={"player_id": "int32"})
+_knn_pack = np.load("data/knn_matrix.npz")
+Xk = _knn_pack["X"]            # already standardized
+_knn_mean = _knn_pack["mean"]
+_knn_scale = _knn_pack["scale"]
 def comparable_transfers(row):
     xr = prep(pd.DataFrame([row]))
     for c in CATS:
         xr[c] = xr[c].cat.codes
-    d = ((_scaler.transform(xr) - Xk) ** 2).sum(axis=1)
+    xr = xr[FEATURES].astype("float64").values
+    xr = (xr - _knn_mean) / _knn_scale
+    d = ((Xk - xr) ** 2).sum(axis=1)
     idx = np.argsort(d)[:6]
-    nb = moved.iloc[idx]
+    nb = _knn_meta.iloc[idx]
     clubs = nb["to_club_name"].value_counts()
     return {
         "destinations": [{"club": c, "n": int(n)} for c, n in clubs.head(3).items()],
