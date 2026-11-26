@@ -1,0 +1,1 @@
+{"roc_auc": 0.653, "pr_auc": 0.163, "brier": 0.175, "fee_mae": 3.8, "fee_r2": 0.782, "n_rows": 56204, "n_transfers": 5330}

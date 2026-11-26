@@ -1,5 +1,4 @@
-model/
+__pycache__/
+*.pyc
 data/raw/
 data/faces/
-data/real_players.csv
-data/players.csv
