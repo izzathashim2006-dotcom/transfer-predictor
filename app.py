@@ -85,6 +85,33 @@ def comparable_transfers(row):
                     for _, r in nb.head(3).iterrows()],
     }
 
+# ---- "why?" explanation: one-feature-at-a-time ablation vs dataset median ----
+_WHY = [  # (raw column in df, human label)
+    ("market_value_eur", "Market value"),
+    ("mv_trend_12m", "Value momentum"),
+    ("age", "Age"),
+    ("minutes", "Playing time"),
+    ("goals_per90", "Goal threat"),
+    ("assists_per90", "Creativity"),
+    ("availability", "Availability"),
+    ("longest_gap_days", "Injury gap"),
+]
+_medians = {col: float(df[col].median()) for col, _ in _WHY}
+
+def why_contributions(row):
+    base_row = predict_row(row)
+    rows = []
+    for col, _label in _WHY:
+        alt = row.copy()
+        alt[col] = _medians[col]
+        rows.append(alt)
+    X = prep(pd.DataFrame(rows))
+    probs = clf_pack["model"].predict_proba(X)[:, 1]
+    pts = [(float(base_row[0]) - float(pr)) * 100 for pr in probs]  # + = pushes towards a move
+    out = sorted(({"label": label, "pts": round(pt, 1)}
+                  for (col, label), pt in zip(_WHY, pts)), key=lambda d: -abs(d["pts"]))
+    return out
+
 def predict_row(row):
     X = prep(pd.DataFrame([row]))
     prob = float(clf_pack["model"].predict_proba(X)[0, 1])
@@ -218,6 +245,7 @@ def predict():
         return jsonify({"error": "not found"}), 404
     r = row.iloc[0]
     prob, fee = predict_row(r)
+    why = why_contributions(r)
     dests = comparable_transfers(r)
     return jsonify({
         "name": r["name"], "season": int(r["season"]), "position": r["position"],
@@ -226,7 +254,7 @@ def predict():
         "goals": int(r["goals"]), "assists": int(r["assists"]),
         "availability": float(r["availability"]), "gap": int(r["longest_gap_days"]),
         "mv": float(r["market_value_eur"]), "mv_trend": float(r["mv_trend_12m"]),
-        "prob": prob, "fee": fee,
+        "prob": prob, "fee": fee, "why": why,
         "destinations": dests["destinations"], "similar": dests["similar"],
         "seasons": sorted(rows["season"].astype(int).unique().tolist()),
     })

@@ -212,3 +212,20 @@ footer{color:var(--muted);font-size:.78rem;margin-top:30px;border-top:1px solid 
 .chip:hover,.dchip:hover{transform:translateY(-2px)}
 .theme-btn:hover{transform:rotate(12deg)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------------- why? waterfall */
+.why-rows{display:flex;flex-direction:column;gap:7px}
+.why-row{display:grid;grid-template-columns:120px 1fr 76px;gap:12px;align-items:center}
+.why-row .wl{font-size:.84rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.why-row .wbar{position:relative;height:14px;background:var(--panel);border:1px solid var(--border);border-radius:7px}
+.why-row .wbar b.tick{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--border)}
+.why-row .wbar i{position:absolute;top:2px;bottom:2px;border-radius:5px;
+  animation:wipe .7s cubic-bezier(.2,.8,.2,1) both}
+.why-row .wbar i.up{background:linear-gradient(90deg,rgba(63,185,80,.45),var(--green))}
+.why-row .wbar i.down{background:linear-gradient(270deg,rgba(248,113,73,.45),var(--red))}
+@keyframes wipe{from{width:0!important}}
+.why-row .wpts{font-size:.82rem;font-weight:700;text-align:right}
+.why-row .wpts.up{color:var(--green)}
+.why-row .wpts.down{color:var(--red)}
+.why-legend{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:10px}
+@media(max-width:640px){.why-row{grid-template-columns:96px 1fr 62px;gap:8px}}

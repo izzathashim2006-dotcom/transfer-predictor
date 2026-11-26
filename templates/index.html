@@ -82,7 +82,12 @@
       </div>
       <div class="bar"><i id="pBar"></i></div>
       <div class="stats" id="pStats"></div>
-      <div class="dest" id="pDest">
+      <div class="dest" id="pWhy" style="display:none">
+      <h4>Why this prediction — what pushes him towards (or away from) a move</h4>
+      <div class="why-rows" id="pWhyRows"></div>
+      <div class="why-legend"><span>◀ holds him back</span><span>pushes a move ▶</span></div>
+    </div>
+    <div class="dest" id="pDest">
         <h4>Predicted destination clubs · most similar past transfers</h4>
         <div class="destchips" id="pDestChips"></div>
         <div class="simlist" id="pSims"></div>
@@ -179,6 +184,18 @@ async function loadPlayer(pid, season) {
   $('pFee').textContent = r.fee >= 0.2 ? fmtM(r.fee) : '—';
   if (window.__animateCount) { __animateCount(el, 700); __animateCount($('pFee'), 800); }
   $('pBar').style.width = pct + '%';
+  const why = (r.why || []).filter(w => Math.abs(w.pts) >= 0.5).slice(0, 6);
+  document.getElementById('pWhy').style.display = why.length ? '' : 'none';
+  const maxAbs = Math.max(1, ...why.map(w => Math.abs(w.pts)));
+  $('pWhyRows').innerHTML = why.map(w => {
+    const pctW = Math.abs(w.pts) / maxAbs * 50;
+    const pos = w.pts >= 0;
+    return `<div class="why-row">
+      <span class="wl">${w.label}</span>
+      <span class="wbar"><i class="${pos ? 'up' : 'down'}" style="${pos ? 'left:50%' : 'right:50%'};width:${pctW}%"></i><b class="tick"></b></span>
+      <span class="wpts ${pos ? 'up' : 'down'}">${pos ? '+' : ''}${w.pts.toFixed(1)} pts</span>
+    </div>`;
+  }).join('');
   document.getElementById('pDest').style.display = (r.destinations && r.destinations.length) ? '' : 'none';
   $('pDestChips').innerHTML = (r.destinations || []).map(d =>
     `<span class="dchip">${d.club} <b>×${d.n}</b></span>`).join('');
