@@ -65,8 +65,21 @@ def main():
     Xtr, Xte, ytr, yte = X.iloc[:-8000], X.iloc[-8000:], df["transferred"].iloc[:-8000], df["transferred"].iloc[-8000:]
     m = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.08, class_weight={0: 1, 1: 2}, random_state=42).fit(Xtr, ytr)
     imp = permutation_importance(m, Xte, yte, n_repeats=3, random_state=42, n_jobs=-1)
-    s = pd.Series(imp.importances_mean, index=X.columns).sort_values(ascending=False).head(12)
-    print(s.round(4).to_string())
+    s = pd.Series(imp.importances_mean, index=X.columns).sort_values(ascending=False)
+    print(s.head(12).round(4).to_string())
+
+    import json
+    Path("model").joinpath("real_feature_importance.json").write_text(json.dumps({k: round(float(v), 5) for k, v in s.items()}))
+    Path("model").joinpath("real_metrics.json").write_text(json.dumps({
+        "roc_auc": round(float(roc_auc_score(df['transferred'], p)), 3),
+        "pr_auc": round(float(average_precision_score(df['transferred'], p)), 3),
+        "brier": round(float(brier_score_loss(df['transferred'], p)), 3),
+        "fee_mae": round(float(mean_absolute_error(real, pred_fee)), 1),
+        "fee_r2": round(float(r2_score(ym, np.log1p(pred_fee))), 3),
+        "n_rows": int(len(df)),
+        "n_transfers": int(df['transferred'].sum()),
+    }))
+    print("Saved metrics + importance to model/")
 
 if __name__ == "__main__":
     main()
