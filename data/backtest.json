@@ -2,71 +2,71 @@
  "calibration": [
   {
    "lo": 0.0,
-   "hi": 0.6,
-   "predicted": 0.4,
+   "hi": 0.8,
+   "predicted": 0.7,
    "actual": 0.4,
+   "n": 5620
+  },
+  {
+   "lo": 0.8,
+   "hi": 1.4,
+   "predicted": 1.1,
+   "actual": 2.5,
    "n": 5621
   },
   {
-   "lo": 0.6,
-   "hi": 1.2,
-   "predicted": 0.9,
-   "actual": 3.1,
+   "lo": 1.4,
+   "hi": 3.0,
+   "predicted": 2.1,
+   "actual": 6.4,
    "n": 5620
   },
   {
-   "lo": 1.2,
-   "hi": 2.9,
-   "predicted": 1.9,
-   "actual": 6.6,
-   "n": 5620
-  },
-  {
-   "lo": 2.9,
-   "hi": 7.1,
+   "lo": 3.0,
+   "hi": 6.9,
    "predicted": 4.8,
-   "actual": 6.9,
+   "actual": 7.5,
    "n": 5621
   },
   {
-   "lo": 7.1,
-   "hi": 13.6,
-   "predicted": 10.2,
-   "actual": 10.6,
+   "lo": 6.9,
+   "hi": 13.5,
+   "predicted": 10.0,
+   "actual": 10.8,
    "n": 5620
   },
   {
-   "lo": 13.6,
-   "hi": 21.3,
-   "predicted": 17.4,
+   "lo": 13.5,
+   "hi": 21.1,
+   "predicted": 17.2,
+   "actual": 13.5,
+   "n": 5620
+  },
+  {
+   "lo": 21.1,
+   "hi": 30.7,
+   "predicted": 25.6,
+   "actual": 14.3,
+   "n": 5621
+  },
+  {
+   "lo": 30.7,
+   "hi": 46.9,
+   "predicted": 37.8,
    "actual": 13.0,
    "n": 5620
   },
   {
-   "lo": 21.3,
-   "hi": 30.6,
-   "predicted": 25.7,
-   "actual": 14.0,
-   "n": 5621
-  },
-  {
-   "lo": 30.6,
-   "hi": 46.8,
-   "predicted": 37.6,
-   "actual": 13.6,
+   "lo": 46.9,
+   "hi": 84.2,
+   "predicted": 64.1,
+   "actual": 7.4,
    "n": 5620
   },
   {
-   "lo": 46.8,
-   "hi": 82.7,
-   "predicted": 63.5,
-   "actual": 7.5,
-   "n": 5620
-  },
-  {
-   "lo": 82.7,
+   "lo": 84.2,
    "hi": 101.0,
-   "predicted": 90.9,
+   "predicted": 92.2,
    "actual": 19.0,
    "n": 5621
   }
@@ -80,7 +80,7 @@
    "age": 20.0,
    "mv": 120000000.0,
    "pred_prob": 95,
-   "pred_fee": 114.3,
+   "pred_fee": 118.6,
    "actual_club": "Real Madrid",
    "actual_fee": 127.0
   },
@@ -91,8 +91,8 @@
    "league": "Premier League",
    "age": 24.5,
    "mv": 90000000.0,
-   "pred_prob": 11,
-   "pred_fee": 106.4,
+   "pred_prob": 7,
+   "pred_fee": 105.2,
    "actual_club": "Arsenal",
    "actual_fee": 116.6
   },
@@ -103,8 +103,8 @@
    "league": "Bundesliga",
    "age": 21.9,
    "mv": 150000000.0,
-   "pred_prob": 18,
-   "pred_fee": 68.5,
+   "pred_prob": 17,
+   "pred_fee": 69.5,
    "actual_club": "Man City",
    "actual_fee": 60.0
   },
@@ -115,8 +115,8 @@
    "league": "Premier League",
    "age": 21.7,
    "mv": 75000000.0,
-   "pred_prob": 91,
-   "pred_fee": 98.3,
+   "pred_prob": 90,
+   "pred_fee": 100.5,
    "actual_club": "Chelsea",
    "actual_fee": 116.0
   },
@@ -127,8 +127,8 @@
    "league": "Premier League",
    "age": 25.8,
    "mv": 65000000.0,
-   "pred_prob": 17,
-   "pred_fee": 96.4,
+   "pred_prob": 18,
+   "pred_fee": 97.2,
    "actual_club": "Man City",
    "actual_fee": 117.5
   },
@@ -139,8 +139,8 @@
    "league": "Serie A",
    "age": 28.1,
    "mv": 100000000.0,
-   "pred_prob": 4,
-   "pred_fee": 91.7,
+   "pred_prob": 6,
+   "pred_fee": 89.7,
    "actual_club": "Chelsea",
    "actual_fee": 113.0
   },
@@ -151,8 +151,8 @@
    "league": "Eredivisie",
    "age": 22.3,
    "mv": 35000000.0,
-   "pred_prob": 93,
-   "pred_fee": 59.4,
+   "pred_prob": 96,
+   "pred_fee": 60.5,
    "actual_club": "Man Utd",
    "actual_fee": 95.0
   },
@@ -164,7 +164,7 @@
    "age": 23.9,
    "mv": 28000000.0,
    "pred_prob": 21,
-   "pred_fee": 47.6,
+   "pred_fee": 50.3,
    "actual_club": "Chelsea",
    "actual_fee": 65.3
   },
@@ -175,8 +175,8 @@
    "league": "Primeira Liga",
    "age": 23.0,
    "mv": 55000000.0,
-   "pred_prob": 94,
-   "pred_fee": 75.7,
+   "pred_prob": 96,
+   "pred_fee": 77.4,
    "actual_club": "Liverpool",
    "actual_fee": 85.0
   },
@@ -187,8 +187,8 @@
    "league": "Ligue 1",
    "age": 22.4,
    "mv": 60000000.0,
-   "pred_prob": 25,
-   "pred_fee": 70.1,
+   "pred_prob": 30,
+   "pred_fee": 68.4,
    "actual_club": "Real Madrid",
    "actual_fee": 80.0
   },
@@ -199,8 +199,8 @@
    "league": "Bundesliga",
    "age": 21.4,
    "mv": 75000000.0,
-   "pred_prob": 92,
-   "pred_fee": 84.1,
+   "pred_prob": 91,
+   "pred_fee": 80.9,
    "actual_club": "Man City",
    "actual_fee": 90.0
   }
@@ -209,7 +209,7 @@
   "n": 56204,
   "transfers": 5330,
   "top_decile_captured": 2.0,
-  "roc_auc": 0.653,
+  "roc_auc": 0.652,
   "showcase_hits": 5
  }
 }

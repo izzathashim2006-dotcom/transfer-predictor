@@ -18,6 +18,7 @@ from sklearn.inspection import permutation_importance
 FEATURES = [
     "age", "apps", "minutes", "goals", "assists", "goals_per90", "assists_per90",
     "cards", "reds", "longest_gap_days", "gaps_over_21d", "availability",
+    "int_apps", "int_goals", "euro_apps",
     "log_mv", "mv_trend_12m", "height_cm", "position", "foot", "league", "season",
 ]
 CATS = ["position", "foot", "league"]

@@ -31,10 +31,22 @@ apps = pd.read_csv(
 )
 apps["season"] = np.where(apps["date"].dt.month >= 7, apps["date"].dt.year, apps["date"].dt.year - 1)
 
-# keep club competitions only (drop national-team fixtures)
+# competition typing: club comps, national-team comps, international club cups
 _g0 = pd.read_csv(f"{RAW}/games.csv", usecols=["competition_id", "competition_type"])
-club_comps = set(_g0.loc[_g0["competition_type"] != "national_team_competition", "competition_id"])
+_type = dict(zip(_g0["competition_id"], _g0["competition_type"]))
+club_comps = {c for c, t in _type.items() if t != "national_team_competition"}
+national_comps = {c for c, t in _type.items() if t == "national_team_competition"}
+euro_cup_comps = {c for c, t in _type.items() if t == "international_cup"}
 del _g0
+
+# achievements-adjacent features: national-team + European cup appearances that season
+_int_mask = apps["competition_id"].isin(national_comps)
+_int = apps[_int_mask].groupby(["player_id", "season"]).agg(
+    int_apps=("minutes_played", "size"), int_goals=("goals", "sum")).reset_index()
+_euro = apps[apps["competition_id"].isin(euro_cup_comps)].groupby(["player_id", "season"]).agg(
+    euro_apps=("minutes_played", "size")).reset_index()
+
+# keep club competitions only (drop national-team fixtures) for club performance
 apps = apps[apps["competition_id"].isin(club_comps)]
 
 print("Aggregating per player-season...")
@@ -84,6 +96,11 @@ perf = perf.merge(club_games, left_on=["season", "club_id"], right_on=["season",
 perf = perf.drop(columns="club_id")
 perf["club_games"] = perf["club_games"].fillna(20).clip(15, 70)
 perf["availability"] = (perf["apps"] / perf["club_games"]).clip(0, 1.15).round(3)
+perf = perf.merge(_int, on=["player_id", "season"], how="left")
+perf = perf.merge(_euro, on=["player_id", "season"], how="left")
+perf["int_apps"] = perf["int_apps"].fillna(0).astype(int)
+perf["int_goals"] = perf["int_goals"].fillna(0).astype(int)
+perf["euro_apps"] = perf["euro_apps"].fillna(0).astype(int)
 
 # ---------------------------------------------------------------- valuations
 print("Loading valuations...")
@@ -154,6 +171,7 @@ df = perf[(perf["apps"] >= 10) & (perf["minutes"] >= 450) &
 df = df[["player_id", "name", "season", "position", "sub_position", "foot", "height_in_cm",
          "age", "league", "apps", "minutes", "goals", "assists", "goals_per90", "assists_per90",
          "cards", "reds", "longest_gap_days", "gaps_over_21d", "availability",
+         "int_apps", "int_goals", "euro_apps",
          "mv_eur", "mv_trend_12m", "transferred", "fee_millions"]]
 df = df.rename(columns={"height_in_cm": "height_cm", "mv_eur": "market_value_eur"})
 df.to_csv("data/real_players.csv", index=False)

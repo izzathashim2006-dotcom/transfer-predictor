@@ -95,6 +95,7 @@ _WHY = [  # (raw column in df, human label)
     ("assists_per90", "Creativity"),
     ("availability", "Availability"),
     ("longest_gap_days", "Injury gap"),
+    ("int_apps", "Int'l pedigree"),
 ]
 _medians = {col: float(df[col].median()) for col, _ in _WHY}
 
@@ -155,6 +156,7 @@ AXES = [
     ("Fitness", "longest_gap_days", True),
     ("Market value", "market_value_eur", False),
     ("Momentum 12m", "mv_trend_12m", False),
+    ("Int'l pedigree", "int_apps", False),
 ]
 _pct = {col: np.sort(df[col].fillna(df[col].median()).values) for _, col, _ in AXES}
 _pct["__age__"] = np.sort(np.abs(df["age"].values - 24.5))
