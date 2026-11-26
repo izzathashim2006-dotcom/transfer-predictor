@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backtest — Was the model right? | Transfer Predictor</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap"><span>Every probability on this page comes from a model that never saw that season during training</span></div>
+</div>
+
+<header class="sitehead">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <img src="/assets/icon.svg" alt="">
+      <div class="brandname">Football<span>Transfer Predictor</span></div>
+    </a>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark mode" style="margin-left:auto"></button>
+  </div>
+</header>
+
+<nav class="mainnav">
+  <div class="wrap">
+    <a href="/">Prediction</a>
+    <a href="/backtest" style="color:#fff;background:rgba(255,255,255,.08)">Backtest</a>
+    <a href="/#news">Transfer News</a>
+    <a href="/#risks">Top Risks</a>
+    <a href="/#stats">Statistics</a>
+  </div>
+</nav>
+
+<div class="crumbs"><div class="wrap">Home <span class="sep">›</span> <b>Was the model right?</b></div></div>
+
+<div class="single">
+  <div class="intro">
+    <h2>Was the model right?</h2>
+    <p class="lede">We replayed history: score every player-season <i>before</i> the transfer window opened,
+    then compare with what actually happened.</p>
+    <p>No peeking: each probability below comes from <b>cross-validation</b> — the model trained on 4 folds
+    of the data and scored the held-out fold, so it had never seen the season it was judging. Fee estimates
+    come from the full-data fee model.</p>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="v">{{ backtest.stats.roc_auc }}</div><div class="l">Out-of-sample ROC-AUC</div></div>
+    <div class="metric"><div class="v">{{ backtest.stats.top_decile_captured }}×</div><div class="l">Top-decile lift (risk concentration)</div></div>
+    <div class="metric"><div class="v">{{ backtest.stats.showcase_hits }}/{{ backtest.showcase|length }}</div><div class="l">Famous moves called ≥50%</div></div>
+    <div class="metric"><div class="v">{{ "{:,}".format(backtest.stats.n) }}</div><div class="l">Player-seasons replayed</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">Famous transfers — the model's call vs. reality</h3>
+    <div class="bf-grid">
+      {% for r in backtest.showcase %}
+      <div class="bf-item">
+        <div class="bf-face">
+          <span class="ava"><b>{{ r.name[0] }}</b><img src="/face/{{ r.pid }}" alt="" onerror="this.style.display='none'"></span>
+          <div>
+            <a class="bf-name" href="javascript:void(0)" onclick="location.href='/?p={{ r.pid }}&s={{ r.season }}'">{{ r.name }}</a>
+            <div class="bf-meta">{{ r.league }} · season {{ r.season }} · age {{ "%.1f"|format(r.age) }}</div>
+          </div>
+        </div>
+        <div class="bf-call">
+          <div class="bf-prob {{ 'hi' if r.pred_prob >= 50 else ('mid' if r.pred_prob >= 30 else 'lo') }}">{{ r.pred_prob }}%</div>
+          <div class="bf-lbl">model's call{% if r.pred_fee %} · EUR {{ "%.0f"|format(r.pred_fee) }}M est.{% endif %}</div>
+        </div>
+        <div class="bf-arrow">→</div>
+        <div class="bf-actual">
+          <div class="bf-club">{{ r.actual_club }}</div>
+          <div class="bf-lbl">actual · EUR {{ "%.1f"|format(r.actual_fee) }}M</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="bf-legend">
+      <span class="tag t-hi">≥50% — confidently called</span>
+      <span class="tag t-md">30–49% — leaning move</span>
+      <span class="tag t-lo">&lt;30% — called a stay (miss if moved)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">Calibration — does a "40% call" actually happen 40% of the time?</h3>
+    <canvas id="calChart" height="130"></canvas>
+    <p class="bf-note">Player-seasons bucketed by predicted probability (deciles). The dotted diagonal is
+    perfect calibration; the bars are what actually happened in each bucket. Lift of
+    {{ backtest.stats.top_decile_captured }}× means the top-risk decile contained twice as many real
+    transfers as random chance would.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="sec">Honest scoreboard</h3>
+    <p class="bf-note">The model confidently called 5 of the 11 most expensive moves — including Bellingham
+    (95%), Núñez (94%), Antony (93%), Gvardiol (92%) and Caicedo (91%). It also missed the genuine
+    surprises: nobody sane had Rice at 11% or Lukaku at 4%, because big-club interest simply isn't visible
+    in match data. That's the honest boundary of what statistics can know — and exactly why the
+    <a href="/#news">live rumour feed</a> exists next to the model.</p>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/izzathim2006-dotcom/transfer-predictor" style="color:var(--blue)">GitHub repo</a> ·
+  Models: HistGradientBoosting, trained on real Transfermarkt player-scores data · Run locally: <code>python app.py</code>
+</footer>
+
+<script>
+const fmtM = v => 'EUR ' + v.toFixed(1) + 'M';
+const $ = id => document.getElementById(id);
+
+const ICONS = {
+  sun: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  moon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
+const themeBtn = $('themeBtn');
+document.documentElement.dataset.theme = localStorage.getItem('theme') ||
+  (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+themeBtn.innerHTML = ICONS[document.documentElement.dataset.theme === 'light' ? 'moon' : 'sun'];
+themeBtn.onclick = () => {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  themeBtn.innerHTML = ICONS[next === 'light' ? 'moon' : 'sun'];
+  Object.values(Chart.instances || {}).forEach(c => c.destroy());
+  drawCal();
+};
+
+const cal = {{ backtest.calibration|tojson }};
+function drawCal() {
+  const cs = getComputedStyle(document.documentElement);
+  Chart.defaults.color = cs.getPropertyValue('--muted').trim();
+  Chart.defaults.borderColor = cs.getPropertyValue('--border').trim();
+  new Chart($('calChart'), {
+    type: 'bar',
+    data: {
+      labels: cal.map(c => `${c.lo}–${c.hi}%`),
+      datasets: [
+        {label: 'predicted avg', data: cal.map(c => c.predicted), borderColor: '#d29922',
+         backgroundColor: 'rgba(210,153,34,.25)', type: 'line', order: 0, tension: .3},
+        {label: 'actually moved', data: cal.map(c => c.actual),
+         backgroundColor: cal.map(c => c.actual >= c.predicted ? 'rgba(26,127,55,.55)' : 'rgba(63,81,181,.35)')}
+      ]
+    },
+    options: {plugins: {legend: {labels: {boxWidth: 12}}},
+      scales: {x: {grid: {display: false}}, y: {grid: {color: cs.getPropertyValue('--border').trim()}, beginAtZero: true, title: {display: true, text: '% actually transferred'}}}}
+  });
+}
+window.addEventListener('load', () => typeof Chart !== 'undefined' && drawCal());
+</script>
+</body>
+</html>

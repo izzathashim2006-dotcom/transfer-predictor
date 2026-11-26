@@ -45,6 +45,7 @@ def face(pid):
 clf_pack = joblib.load("model/real_transfer_classifier.joblib")
 reg_pack = joblib.load("model/real_fee_regressor.joblib")
 metrics = json.loads(Path("model/real_metrics.json").read_text())
+backtest = json.loads(Path("data/backtest.json").read_text()) if Path("data/backtest.json").exists() else None
 importance = json.loads(Path("model/real_feature_importance.json").read_text())
 df = pd.read_csv("data/real_players.csv")
 df["norm"] = df["name"].astype(str).str.normalize("NFKD").str.encode("ascii", "ignore").str.decode("ascii").str.lower()
@@ -96,20 +97,36 @@ def predict_batch(rows):
     fee = np.expm1(reg_pack["model"].predict(X))
     return prob, fee
 
+_risk_cache = {"t": 0, "rows": []}
+
+def top_risk_rows(n=12):
+    import time as _time
+    if _time.time() - _risk_cache["t"] > 60:
+        sample = latest[latest["season"] >= 2023]
+        pr, fr = predict_batch(sample)
+        risks = sample.assign(p=pr, f=fr)
+        _risk_cache["rows"] = [{
+            "name": r["name"], "player_id": int(r["player_id"]), "season": int(r["season"]),
+            "position": r["position"], "league": r["league"], "age": float(r["age"]),
+            "mv": float(r["market_value_eur"]), "prob": round(r["p"] * 100), "fee": round(r["f"], 1),
+            "pid": int(r["player_id"]),
+        } for _, r in risks.nlargest(30, "p").iterrows()]
+        _risk_cache["t"] = _time.time()
+    return _risk_cache["rows"][:n]
+
 @app.route("/")
 def index():
-    # top risk players: highest predicted probability among latest seasons
-    sample = latest[latest["season"] >= 2023]
-    p, f = predict_batch(sample)
-    risks = sample.assign(p=p, f=f)
-    top_risk_rows = [{
-        "name": r["name"], "player_id": int(r["player_id"]), "season": int(r["season"]),
-        "position": r["position"], "league": r["league"], "age": float(r["age"]),
-        "mv": float(r["market_value_eur"]), "prob": round(r["p"] * 100), "fee": round(r["f"], 1),
-        "pid": int(r["player_id"]),
-    } for _, r in risks.nlargest(12, "p").iterrows()]
     return render_template("index.html", metrics=metrics, importance=importance,
-                           chart=chart, top_risk=top_risk_rows)
+                           chart=chart, top_risk=top_risk_rows(12))
+
+@app.route("/backtest")
+def backtest_page():
+    return render_template("backtest.html", metrics=metrics, backtest=backtest)
+
+@app.route("/api/toprisk")
+def api_toprisk():
+    n = min(int(request.args.get("n", 8)), 30)
+    return jsonify(top_risk_rows(n))
 
 @app.route("/api/search")
 def search():

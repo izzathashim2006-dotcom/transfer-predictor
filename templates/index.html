@@ -4,152 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Transfer Predictor — Real Transfermarkt Data</title>
-<style>
-:root{
-  --head:#0a1f38; --head2:#0d2c4f; --nav:#0b2745;
-  --bg:#f6f8fa; --panel:#ffffff; --panel2:#eef1f5; --border:#d0d7de;
-  --text:#1f2328; --muted:#656d76; --green:#1a7f37; --amber:#9a6700; --red:#cf222e; --blue:#0969da;
-  --accent:#0e8a72; --hover:#e4e9ef; --bar-track:#dfe4ea; --card-shadow:0 4px 14px rgba(20,40,60,.08);
-  --headtext:#ffffff; --headmuted:#9fb3c8;
-}
-:root[data-theme="dark"]{
-  --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
-  --text:#e6edf3; --muted:#8b949e; --green:#3fb950; --amber:#d29922; --red:#f85149; --blue:#58a6ff;
-  --accent:#2dd4a8; --hover:#243044; --bar-track:#1c2330; --card-shadow:0 8px 24px rgba(0,0,0,.5);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.55}
-
-/* ---------------- header / nav (always navy, like the reference layout) */
-.topbar{background:var(--head);height:34px}
-.topbar .wrap{display:flex;justify-content:flex-end;align-items:center;height:100%;gap:10px;
-  color:var(--headmuted);font-size:.78rem}
-.sitehead{background:var(--head);border-bottom:1px solid rgba(255,255,255,.06)}
-.sitehead .wrap{display:flex;align-items:center;gap:20px;padding:22px 20px}
-.brand{display:flex;align-items:center;gap:14px;text-decoration:none}
-.brand img{width:54px;height:54px}
-.brandname{color:var(--headtext);font-weight:800;font-size:1.7rem;letter-spacing:.02em;line-height:1.05;
-  text-transform:uppercase;font-style:italic}
-.brandname span{display:block;font-size:.72rem;font-weight:600;letter-spacing:.28em;color:var(--accent);font-style:normal}
-.headsearch{margin-left:auto;position:relative;width:min(400px,40vw)}
-.headsearch input{width:100%;padding:13px 44px 13px 16px;font-size:.98rem;border-radius:8px;background:var(--head2);
-  border:1px solid rgba(255,255,255,.14);border-radius:6px;color:#fff;outline:none}
-.headsearch input::placeholder{color:var(--headmuted)}
-.headsearch input:focus{border-color:var(--accent)}
-.headsearch .go{position:absolute;right:0;top:0;bottom:0;width:40px;border:none;background:none;
-  color:var(--headmuted);cursor:pointer;font-size:1rem}
-.results{position:absolute;top:100%;left:0;right:0;background:var(--panel);border:1px solid var(--border);
-  border-radius:10px;margin-top:6px;z-index:30;overflow:hidden;box-shadow:var(--card-shadow)}
-.results div{padding:9px 14px;cursor:pointer}
-.results div:hover{background:var(--hover)}
-.resrow{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.resrow .who{display:flex;align-items:center;gap:10px;min-width:0}
-.resrow .who b{display:block}
-.resrow .who span span{font-size:.78rem;color:var(--muted)}
-.resrow .mv{color:var(--green);white-space:nowrap;font-size:.88rem}
-.theme-btn{background:var(--head2);border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:8px;
-  padding:10px 12px;cursor:pointer;line-height:1;display:flex;align-items:center}
-.theme-btn svg{width:18px;height:18px;display:block;stroke:var(--accent)}
-.theme-btn:hover{border-color:var(--accent)}
-
-.mainnav{background:var(--nav)}
-.mainnav .wrap{display:flex;flex-wrap:wrap}
-.mainnav a{color:#dbe7f3;text-decoration:none;font-weight:600;font-size:.93rem;padding:15px 18px;display:block}
-.mainnav a:hover{color:#fff;background:rgba(255,255,255,.06)}
-.crumbs{background:var(--head);color:var(--headmuted);font-size:.82rem}
-.crumbs .wrap{padding:9px 20px;display:flex;gap:8px;align-items:center}
-.crumbs b{color:var(--headtext);font-weight:600}
-.crumbs .sep{opacity:.55}
-
-/* ---------------- layout: main + sidebar */
-.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:44px;padding-top:40px;margin:0 auto;
-  max-width:1200px;padding-left:20px;padding-right:20px}
-@media(max-width:900px){.layout{grid-template-columns:1fr}}
-.colmain{min-width:0}
-.intro h2{color:var(--accent);font-size:1.95rem;letter-spacing:-.01em;margin-bottom:14px;line-height:1.2}
-.intro .lede{font-style:italic;color:var(--text);margin-bottom:16px;font-size:1.08rem}
-.intro p{margin-bottom:13px;font-size:.98rem;max-width:64ch}
-
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 30px}
-.metric{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
-  box-shadow:var(--card-shadow)}
-.metric .v{font-size:1.55rem;font-weight:800;color:var(--blue);letter-spacing:-.01em}
-.metric .l{font-size:.78rem;color:var(--muted);margin-top:2px}
-
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:28px;
-  box-shadow:var(--card-shadow)}
-h3.sec{color:var(--accent);font-size:1.28rem;margin-bottom:18px}
-h3.sec::after{content:'';display:block;width:46px;height:3px;background:var(--accent);border-radius:2px;margin-top:8px}
-
-.ava{position:relative;width:72px;height:72px;border-radius:50%;background:var(--panel2);
-  display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid var(--border)}
-.ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
-.ava b{color:var(--muted);font-size:1.2rem}
-.ava.sm{width:34px;height:34px;border-radius:8px}
-.ava.sm b{font-size:.7rem}
-.pred-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px}
-.pred-title{display:flex;align-items:center;gap:14px}
-.pred-head h2{font-size:1.3rem}
-.pred-head .meta{color:var(--muted);font-size:.88rem;margin-top:4px}
-.gauge{display:flex;gap:24px}
-.gauge .num{text-align:center}
-.gauge .big{font-size:2.7rem;font-weight:800;letter-spacing:-.02em}
-.gauge .lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.bar{height:9px;background:var(--bar-track);border-radius:6px;overflow:hidden;margin:6px 0 18px}
-.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--amber) 55%,var(--red))}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
-.stat{background:var(--panel2);border-radius:8px;padding:9px 12px}
-.stat .v{font-weight:700}
-.stat .l{font-size:.7rem;color:var(--muted)}
-.dest{background:var(--panel2);border-radius:10px;padding:14px 16px;margin-top:16px}
-.dest h4{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-.destchips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.dchip{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.83rem}
-.dchip b{color:var(--blue)}
-.simlist{font-size:.86rem}
-.simlist div{padding:4px 0;border-bottom:1px dashed var(--border)}
-.simlist b{color:var(--green)}
-
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
-@media(max-width:760px){.grid2{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse;font-size:.93rem}
-th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
-th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-td a{color:var(--text);text-decoration:none;cursor:pointer}
-tr:hover td{background:var(--hover)}
-.playercell{display:flex;align-items:center;gap:10px}
-.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.76rem;font-weight:600}
-.t-hi{background:rgba(207,34,46,.12);color:var(--red)}
-.t-md{background:rgba(154,103,0,.14);color:var(--amber)}
-.t-lo{background:rgba(26,127,55,.14);color:var(--green)}
-:root[data-theme="dark"] .t-hi{background:rgba(248,81,73,.15)}
-:root[data-theme="dark"] .t-md{background:rgba(210,153,34,.15)}
-:root[data-theme="dark"] .t-lo{background:rgba(63,185,80,.15)}
-
-/* ---------------- sidebar: news timeline */
-.sidebar h3{color:var(--accent);font-size:1.2rem;margin-bottom:16px}
-.timeline{position:relative;padding-left:16px}
-.timeline::before{content:'';position:absolute;left:4px;top:8px;bottom:8px;width:2px;background:var(--border)}
-.nitem{position:relative;padding:0 0 18px 14px}
-.nitem .dot{position:absolute;left:-16px;top:5px;width:10px;height:10px;border-radius:50%;
-  background:var(--border)}
-.nitem.live .dot{background:var(--green)}
-.nitem .ntime{font-size:.74rem;color:var(--muted);margin-bottom:2px}
-.nitem .nhead{font-size:.95rem;font-weight:700;cursor:pointer;line-height:1.35}
-.nitem .nhead:hover{color:var(--blue)}
-.nitem .nbody{font-size:.84rem;color:var(--muted);margin-top:4px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);
-  border-radius:10px;padding:5px 9px;cursor:pointer}
-.chip:hover{border-color:var(--blue)}
-.chip .cn{font-size:.82rem;font-weight:600}
-.chip .cv{font-size:.7rem;color:var(--muted)}
-.hidden{display:none}
-footer{color:var(--muted);font-size:.78rem;margin-top:30px;border-top:1px solid var(--border);padding:16px 20px 40px;
-  max-width:1140px;margin-left:auto;margin-right:auto}
-.hidden{display:none}
-</style>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <div class="topbar">
@@ -174,6 +29,7 @@ footer{color:var(--muted);font-size:.78rem;margin-top:30px;border-top:1px solid 
 <nav class="mainnav">
   <div class="wrap">
     <a href="#predict">Prediction</a>
+    <a href="/backtest">Backtest</a>
     <a href="#news">Transfer News</a>
     <a href="#risks">Top Risks</a>
     <a href="#stats">Statistics</a>
@@ -204,7 +60,12 @@ footer{color:var(--muted);font-size:.78rem;margin-top:30px;border-top:1px solid 
       <div class="metric"><div class="v">{{ metrics.n_transfers|default("5,330") }}</div><div class="l">Paid transfers in data</div></div>
     </div>
 
-    <div id="predCard" class="card hidden">
+    <div class="card" id="radar">
+    <h3 class="sec">Live transfer radar — top risks right now <span style="font-size:.72rem;color:var(--muted);font-weight:400">(auto-refreshes every 60s)</span></h3>
+    <div class="radar-rows" id="radarRows"><div class="rmeta">Scanning 56,204 player-seasons…</div></div>
+  </div>
+
+  <div id="predCard" class="card hidden">
       <div class="pred-head">
         <div class="pred-title">
           <span class="ava"><b id="pInitials"></b><img id="pFace" alt="" onerror="this.style.display='none'"></span>
@@ -327,6 +188,24 @@ async function loadPlayer(pid, season) {
   ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
   $('predCard').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
+
+async function loadRadar() {
+  try {
+    const rows = await (await fetch('/api/toprisk?n=8')).json();
+    const el = $('radarRows');
+    el.innerHTML = rows.map(r => `
+      <div class="radar-row" onclick='loadPlayer(${r.player_id}, ${r.season})'>
+        <span class="ava sm"><b>${r.name.trim()[0]}</b><img src="/face/${r.pid}" alt="" onerror="this.style.display='none'"></span>
+        <span class="rn">${r.name}<i class="rl">${r.league} · ${r.position} · age ${r.age.toFixed(1)}</i></span>
+        <span class="rbar"><i style="width:0%" data-w="${r.prob}"></i></span>
+        <span class="rp">${r.prob}%</span>
+        <span class="rf">${fmtM(r.fee)}</span>
+      </div>`).join('');
+    setTimeout(() => el.querySelectorAll('.rbar i').forEach(i => i.style.width = i.dataset.w + '%'), 60);
+  } catch (e) {}
+}
+window.addEventListener('load', loadRadar);
+setInterval(loadRadar, 60000);
 
 async function loadRumours() {
   try {

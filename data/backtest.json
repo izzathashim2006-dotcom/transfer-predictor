@@ -1,0 +1,215 @@
+{
+ "calibration": [
+  {
+   "lo": 0.0,
+   "hi": 0.6,
+   "predicted": 0.4,
+   "actual": 0.4,
+   "n": 5621
+  },
+  {
+   "lo": 0.6,
+   "hi": 1.2,
+   "predicted": 0.9,
+   "actual": 3.1,
+   "n": 5620
+  },
+  {
+   "lo": 1.2,
+   "hi": 2.9,
+   "predicted": 1.9,
+   "actual": 6.6,
+   "n": 5620
+  },
+  {
+   "lo": 2.9,
+   "hi": 7.1,
+   "predicted": 4.8,
+   "actual": 6.9,
+   "n": 5621
+  },
+  {
+   "lo": 7.1,
+   "hi": 13.6,
+   "predicted": 10.2,
+   "actual": 10.6,
+   "n": 5620
+  },
+  {
+   "lo": 13.6,
+   "hi": 21.3,
+   "predicted": 17.4,
+   "actual": 13.0,
+   "n": 5620
+  },
+  {
+   "lo": 21.3,
+   "hi": 30.6,
+   "predicted": 25.7,
+   "actual": 14.0,
+   "n": 5621
+  },
+  {
+   "lo": 30.6,
+   "hi": 46.8,
+   "predicted": 37.6,
+   "actual": 13.6,
+   "n": 5620
+  },
+  {
+   "lo": 46.8,
+   "hi": 82.7,
+   "predicted": 63.5,
+   "actual": 7.5,
+   "n": 5620
+  },
+  {
+   "lo": 82.7,
+   "hi": 101.0,
+   "predicted": 90.9,
+   "actual": 19.0,
+   "n": 5621
+  }
+ ],
+ "showcase": [
+  {
+   "name": "Jude Bellingham",
+   "pid": 581678,
+   "season": 2022,
+   "league": "Bundesliga",
+   "age": 20.0,
+   "mv": 120000000.0,
+   "pred_prob": 95,
+   "pred_fee": 114.3,
+   "actual_club": "Real Madrid",
+   "actual_fee": 127.0
+  },
+  {
+   "name": "Declan Rice",
+   "pid": 357662,
+   "season": 2022,
+   "league": "Premier League",
+   "age": 24.5,
+   "mv": 90000000.0,
+   "pred_prob": 11,
+   "pred_fee": 106.4,
+   "actual_club": "Arsenal",
+   "actual_fee": 116.6
+  },
+  {
+   "name": "Erling Haaland",
+   "pid": 418560,
+   "season": 2021,
+   "league": "Bundesliga",
+   "age": 21.9,
+   "mv": 150000000.0,
+   "pred_prob": 18,
+   "pred_fee": 68.5,
+   "actual_club": "Man City",
+   "actual_fee": 60.0
+  },
+  {
+   "name": "Moisés Caicedo",
+   "pid": 687626,
+   "season": 2022,
+   "league": "Premier League",
+   "age": 21.7,
+   "mv": 75000000.0,
+   "pred_prob": 91,
+   "pred_fee": 98.3,
+   "actual_club": "Chelsea",
+   "actual_fee": 116.0
+  },
+  {
+   "name": "Jack Grealish",
+   "pid": 203460,
+   "season": 2020,
+   "league": "Premier League",
+   "age": 25.8,
+   "mv": 65000000.0,
+   "pred_prob": 17,
+   "pred_fee": 96.4,
+   "actual_club": "Man City",
+   "actual_fee": 117.5
+  },
+  {
+   "name": "Romelu Lukaku",
+   "pid": 96341,
+   "season": 2020,
+   "league": "Serie A",
+   "age": 28.1,
+   "mv": 100000000.0,
+   "pred_prob": 4,
+   "pred_fee": 91.7,
+   "actual_club": "Chelsea",
+   "actual_fee": 113.0
+  },
+  {
+   "name": "Antony",
+   "pid": 602105,
+   "season": 2021,
+   "league": "Eredivisie",
+   "age": 22.3,
+   "mv": 35000000.0,
+   "pred_prob": 93,
+   "pred_fee": 59.4,
+   "actual_club": "Man Utd",
+   "actual_fee": 95.0
+  },
+  {
+   "name": "Marc Cucurella",
+   "pid": 284857,
+   "season": 2021,
+   "league": "Premier League",
+   "age": 23.9,
+   "mv": 28000000.0,
+   "pred_prob": 21,
+   "pred_fee": 47.6,
+   "actual_club": "Chelsea",
+   "actual_fee": 65.3
+  },
+  {
+   "name": "Darwin Núñez",
+   "pid": 546543,
+   "season": 2021,
+   "league": "Primeira Liga",
+   "age": 23.0,
+   "mv": 55000000.0,
+   "pred_prob": 94,
+   "pred_fee": 75.7,
+   "actual_club": "Liverpool",
+   "actual_fee": 85.0
+  },
+  {
+   "name": "Aurélien Tchouaméni",
+   "pid": 413112,
+   "season": 2021,
+   "league": "Ligue 1",
+   "age": 22.4,
+   "mv": 60000000.0,
+   "pred_prob": 25,
+   "pred_fee": 70.1,
+   "actual_club": "Real Madrid",
+   "actual_fee": 80.0
+  },
+  {
+   "name": "Josko Gvardiol",
+   "pid": 475959,
+   "season": 2022,
+   "league": "Bundesliga",
+   "age": 21.4,
+   "mv": 75000000.0,
+   "pred_prob": 92,
+   "pred_fee": 84.1,
+   "actual_club": "Man City",
+   "actual_fee": 90.0
+  }
+ ],
+ "stats": {
+  "n": 56204,
+  "transfers": 5330,
+  "top_decile_captured": 2.0,
+  "roc_auc": 0.653,
+  "showcase_hits": 5
+ }
+}
