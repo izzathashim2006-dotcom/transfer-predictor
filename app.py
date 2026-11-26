@@ -45,7 +45,7 @@ def face(pid):
 clf_pack = joblib.load("model/real_transfer_classifier.joblib")
 reg_pack = joblib.load("model/real_fee_regressor.joblib")
 metrics = json.loads(Path("model/real_metrics.json").read_text())
-backtest = json.loads(Path("data/backtest.json").read_text()) if Path("data/backtest.json").exists() else None
+backtest = json.loads(Path("data/backtest.json").read_text(encoding="utf-8")) if Path("data/backtest.json").exists() else None
 importance = json.loads(Path("model/real_feature_importance.json").read_text())
 df = pd.read_csv("data/real_players.csv")
 df["norm"] = df["name"].astype(str).str.normalize("NFKD").str.encode("ascii", "ignore").str.decode("ascii").str.lower()

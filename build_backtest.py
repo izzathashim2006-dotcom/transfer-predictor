@@ -98,7 +98,7 @@ def main():
     }
     Path("data").mkdir(exist_ok=True)
     Path("data/backtest.json").write_text(json.dumps(
-        {"calibration": cal, "showcase": rows, "stats": stats}, ensure_ascii=False, indent=1))
+        {"calibration": cal, "showcase": rows, "stats": stats}, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"Saved data/backtest.json | showcase rows: {len(rows)} | top-decile lift: {stats['top_decile_captured']}x")
 
 if __name__ == "__main__":
