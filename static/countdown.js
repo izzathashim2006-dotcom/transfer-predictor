@@ -29,12 +29,13 @@
     if (!el) return;
     const now = new Date();
     const {state, next, nextLabel} = nextBoundary(now);
+    const day = next.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
     if (state === 'open') {
-      el.innerHTML = '🟢 <b style="color:#2dd4a8">Transfer window open</b> — closes ' +
-        next.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) + ' (in ' + fmt(next - now) + ')';
+      el.innerHTML = '<span class="wdot open"></span><b>Window open</b>' +
+        '<span class="wsep">·</span><span>closes ' + day + '</span><span class="wtime">' + fmt(next - now) + '</span>';
     } else {
-      el.innerHTML = '🔴 Transfer window closed — ' + nextLabel +
-        ' ' + next.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) + ' (in ' + fmt(next - now) + ')';
+      el.innerHTML = '<span class="wdot closed"></span><span>Window closed</span>' +
+        '<span class="wsep">·</span><span>reopens ' + day + '</span><span class="wtime">' + fmt(next - now) + '</span>';
     }
   }
   document.addEventListener('DOMContentLoaded', () => { tick(); setInterval(tick, 30000); });

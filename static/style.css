@@ -372,3 +372,17 @@ h3.sec{padding-bottom:2px}
 
 /* tables: softer headers */
 th{color:var(--muted);font-weight:700;border-bottom-width:2px;border-bottom-color:color-mix(in srgb,var(--border) 70%,transparent)}
+
+/* ================= topbar window pill ================= */
+.topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.tb-note{color:var(--headmuted);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.window-pill{display:inline-flex;align-items:center;gap:8px;padding:4px 13px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  font-size:.75rem;color:#dbe7f3;white-space:nowrap;flex-shrink:0}
+.window-pill b{font-weight:700;color:#fff}
+.wdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.wdot.open{background:var(--accent);box-shadow:0 0 8px color-mix(in srgb,var(--accent) 70%,transparent)}
+.wdot.closed{background:#5f7188}
+.wsep{opacity:.4}
+.wtime{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+@media(max-width:640px){.tb-note{display:none}}
