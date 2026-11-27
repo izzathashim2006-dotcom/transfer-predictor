@@ -321,3 +321,54 @@ footer code{background:var(--panel2);padding:2px 6px;border-radius:4px;font-size
 .ltv.na{background:var(--panel2);color:var(--muted)}
 @media(max-width:640px){.lt-row{grid-template-columns:34px 1fr auto;grid-template-areas:
   "face main fee" "face main when" "face verdict verdict"}}
+
+/* ================= theme polish v2 ================= */
+:root{
+  --head:#081a30; --head2:#0e2c50; --nav:#0a2240;
+  --bg:#f5f7fb; --panel:#ffffff; --panel2:#f2f5f9; --border:#e4e9f0;
+  --text:#182130; --muted:#68737f; --accent:#0ea47e; --hover:#edf1f6; --bar-track:#e7ecf2;
+  --card-shadow:0 1px 2px rgba(16,32,52,.05),0 6px 18px rgba(16,32,52,.06);
+  --green:#158a4c; --amber:#a16207; --red:#d13438; --blue:#0b6ac0;
+}
+:root[data-theme="dark"]{
+  --head:#060d18; --head2:#0c2038; --nav:#081a30;
+  --bg:#0a0e15; --panel:#10161f; --panel2:#171f2b; --border:#252e3a;
+  --text:#e8eef5; --muted:#8a95a3; --accent:#2dd4a8; --hover:#1c2532; --bar-track:#1a2230;
+  --card-shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45);
+}
+# theme flip is instant (var-driven color transitions stick in some engines)
+.card,.metric,.stat,.dchip,.chip,.tcard{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease}
+
+/* brand accent hairline at the very top of the page */
+.topbar{position:relative;border-bottom:1px solid rgba(255,255,255,.04)}
+.topbar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),#4c8dff 45%,#d29922 80%,transparent)}
+
+/* gradient wordmark + refined search */
+.brandname{background:linear-gradient(180deg,#ffffff,#cfe0f2);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent}
+.brandname span{-webkit-text-fill-color:var(--accent)}
+.headsearch input{border-radius:10px;background:rgba(255,255,255,.06);backdrop-filter:blur(4px)}
+.headsearch input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,212,168,.18)}
+.theme-btn{border-radius:999px;padding:10px 14px}
+
+/* deeper card elevation */
+.card{border-radius:16px;overflow:hidden}
+.card:hover{transform:translateY(-3px)}
+h3.sec{padding-bottom:2px}
+
+/* chips & tags: unified pill system */
+.dchip,.tag,.ltv,.tcard .fits span,.chip .cv{font-variant-numeric:tabular-nums}
+.dchip{border-color:color-mix(in srgb,var(--accent) 25%,var(--border))}
+.chip{border-radius:12px}
+
+/* selection + links */
+::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+.intro a,.bf-note a{color:var(--accent);text-decoration:none;border-bottom:1px dotted currentColor}
+
+/* metric cards: clean top rule, better depth */
+.metric{border-top:2.5px solid var(--accent);border-radius:14px}
+.metric .v{letter-spacing:-.02em}
+
+/* tables: softer headers */
+th{color:var(--muted);font-weight:700;border-bottom-width:2px;border-bottom-color:color-mix(in srgb,var(--border) 70%,transparent)}
